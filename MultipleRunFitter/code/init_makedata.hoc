@@ -1,0 +1,8 @@
+load_file("nrngui.hoc")
+load_file("democell.ses")
+load_file("iclamp_rig.ses")
+load_file("rn.hoc")
+
+print "DC input resistance of cell is ", rn(), "megohms"
+// 153.28491 megohms
+run()

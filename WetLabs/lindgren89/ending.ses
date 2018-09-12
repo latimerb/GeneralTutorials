@@ -1,0 +1,334 @@
+load_file("nrngui.hoc")
+objectvar save_window_, rvp_
+objectvar scene_vector_[3]
+objectvar ocbox_, ocbox_list_, scene_, scene_list_
+{ocbox_list_ = new List()  scene_list_ = new List()}
+{pwman_place(0,0,0)}
+
+//Begin CellBuild[0]
+{
+load_file("celbild.hoc", "CellBuild")
+}
+{ocbox_ = new CellBuild(1)}
+{object_push(ocbox_)}
+{
+version(5.1)
+continuous = 1
+}
+{object_push(topol)}
+{
+first = 0
+slist.remove_all()
+sname = "ax"
+objref tobj
+}
+{
+tobj = new CellBuildSection("node",0, 0, tobj, 0) slist.append(tobj)
+  tobj.position(-150,0,-135,0) tobj.lx=-143.865 tobj.ly=-14.6412 tobj.i3d=0
+tobj = new CellBuildSection("internode",0, 0, tobj, 1) slist.append(tobj)
+tobj.parent=slist.object(0)
+  tobj.position(-135,0,-90,0) tobj.lx=-112.54 tobj.ly=20.5993 tobj.i3d=0
+tobj = new CellBuildSection("node",1, 0, tobj, 1) slist.append(tobj)
+tobj.parent=slist.object(1)
+  tobj.position(-90,0,-75,0) tobj.lx=-85.1307 tobj.ly=-14.6412 tobj.i3d=0
+tobj = new CellBuildSection("internode",1, 0, tobj, 1) slist.append(tobj)
+tobj.parent=slist.object(2)
+  tobj.position(-75,0,-30,0) tobj.lx=-45.9745 tobj.ly=30.3884 tobj.i3d=0
+tobj = new CellBuildSection("node",2, 0, tobj, 1) slist.append(tobj)
+tobj.parent=slist.object(3)
+  tobj.position(-30,0,-15,0) tobj.lx=-22.4808 tobj.ly=-14.6412 tobj.i3d=0
+tobj = new CellBuildSection("internode",2, 0, tobj, 1) slist.append(tobj)
+tobj.parent=slist.object(4)
+  tobj.position(-15,0,27,0) tobj.lx=5.90739 tobj.ly=16.6837 tobj.i3d=0
+tobj = new CellBuildSection("heminode",0, 0, tobj, 1) slist.append(tobj)
+tobj.parent=slist.object(5)
+  tobj.position(27,0,45,0) tobj.lx=38.2112 tobj.ly=-14.6412 tobj.i3d=0
+tobj = new CellBuildSection("ax",0, 0, tobj, 1) slist.append(tobj)
+tobj.parent=slist.object(6)
+  tobj.position(45,0,72,15) tobj.lx=60.726 tobj.ly=1.02125 tobj.i3d=0
+tobj = new CellBuildSection("bouton",0, 0, tobj, 1) slist.append(tobj)
+tobj.parent=slist.object(7)
+  tobj.position(72,15,90,15) tobj.lx=79.3252 tobj.ly=38.2196 tobj.i3d=0
+tobj = new CellBuildSection("ax",1, 0, tobj, 1) slist.append(tobj)
+tobj.parent=slist.object(8)
+  tobj.position(90,15,117.378,28.5431) tobj.lx=112.608 tobj.ly=11.7892 tobj.i3d=0
+tobj = new CellBuildSection("bouton",1, 0, tobj, 1) slist.append(tobj)
+tobj.parent=slist.object(9)
+  tobj.position(117.378,28.5431,135,30) tobj.lx=121.418 tobj.ly=49.9665 tobj.i3d=0
+tobj = new CellBuildSection("ax",2, 0, tobj, 1) slist.append(tobj)
+tobj.parent=slist.object(10)
+  tobj.position(135,30,162.311,43.6698) tobj.lx=154.701 tobj.ly=28.4306 tobj.i3d=0
+tobj = new CellBuildSection("bouton",2, 0, tobj, 1) slist.append(tobj)
+tobj.parent=slist.object(11)
+  tobj.position(162.311,43.6698,180,45) tobj.lx=160.574 tobj.ly=64.65 tobj.i3d=0
+tobj = new CellBuildSection("ax",3, 0, tobj, 1) slist.append(tobj)
+tobj.parent=slist.object(12)
+  tobj.position(180,45,210,60) tobj.lx=199.73 tobj.ly=44.093 tobj.i3d=0
+tobj = new CellBuildSection("bouton",3, 0, tobj, 1) slist.append(tobj)
+tobj.parent=slist.object(13)
+  tobj.position(210,60,225,60) tobj.lx=211.477 tobj.ly=81.2914 tobj.i3d=0
+all_init()
+}
+for i=0, slist.count-1 {slist.object(i).rdses()}
+{object_pop()}
+{
+}
+{object_push(subsets)}
+{first = 0}
+{tobj = new SNList("all_active") snlist.append(tobj)}
+for i=0,11 tobj.add(bild.topol.slist.object(fscan()))
+0
+2
+4
+6
+7
+8
+9
+10
+11
+12
+13
+14
+{tobj = new SNList("internodes") snlist.append(tobj)}
+for i=0,2 tobj.add(bild.topol.slist.object(fscan()))
+1
+3
+5
+{tobj = new SNList("nodes") snlist.append(tobj)}
+for i=0,3 tobj.add(bild.topol.slist.object(fscan()))
+0
+2
+4
+6
+{tobj = new SNList("boutons") snlist.append(tobj)}
+for i=0,3 tobj.add(bild.topol.slist.object(fscan()))
+8
+10
+12
+14
+{tobj = new SNList("thin_active") snlist.append(tobj)}
+for i=0,4 tobj.add(bild.topol.slist.object(fscan()))
+6
+7
+9
+11
+13
+{consist()}
+{object_pop()}
+{
+}
+{object_push(geom)}
+{
+first = 0
+tobj = new GeoSpec(4)
+tobj.value = 4
+bild.subsets.snlist.object(2).geo.append(tobj)
+tobj = new GeoSpec(1)
+tobj.value = 4
+bild.subsets.snlist.object(2).geo.append(tobj)
+tobj = new GeoSpec(4)
+tobj.value = 1
+bild.subsets.snlist.object(3).geo.append(tobj)
+tobj = new GeoSpec(0)
+tobj.value = 2
+bild.subsets.snlist.object(3).geo.append(tobj)
+tobj = new GeoSpec(1)
+tobj.value = 4
+bild.subsets.snlist.object(3).geo.append(tobj)
+tobj = new GeoSpec(4)
+tobj.value = 1
+bild.subsets.snlist.object(4).geo.append(tobj)
+tobj = new GeoSpec(0)
+tobj.value = 5
+bild.subsets.snlist.object(4).geo.append(tobj)
+tobj = new GeoSpec(1)
+tobj.value = 5
+bild.subsets.snlist.object(4).geo.append(tobj)
+tobj = new GeoSpec(4)
+tobj.value = 1
+bild.subsets.snlist.object(5).geo.append(tobj)
+tobj = new GeoSpec(0)
+tobj.value = 2
+bild.subsets.snlist.object(5).geo.append(tobj)
+tobj = new GeoSpec(1)
+tobj.value = 1
+bild.subsets.snlist.object(5).geo.append(tobj)
+tobj = new GeoSpec(0)
+tobj.value = 200
+bild.topol.slist.object(1).geo.append(tobj)
+tobj = new GeoSpec(0)
+tobj.value = 100
+bild.topol.slist.object(3).geo.append(tobj)
+tobj = new GeoSpec(0)
+tobj.value = 50
+bild.topol.slist.object(5).geo.append(tobj)
+tobj = new GeoSpec(0)
+tobj.value = 4
+bild.topol.slist.object(6).geo.append(tobj)
+tobj = new GeoSpec(1)
+tobj.value = 4
+bild.topol.slist.object(6).geo.append(tobj)
+tobj = new GeoSpec(0)
+tobj.value = 4
+bild.topol.slist.object(7).geo.append(tobj)
+tobj = new GeoSpec(1)
+tobj.value = 2
+bild.topol.slist.object(7).geo.append(tobj)
+set_default()
+}
+{object_pop()}
+{
+}
+{object_push(memb)}
+{first=0}
+{
+tobj = new GeoSpec(0)
+tobj.value = 300
+tobj.set_default()
+tobj = new MStanWrap(tobj, 0)
+bild.subsets.snlist.object(0).ml.append(tobj)
+}
+{
+tobj = new GeoSpec(1)
+tobj.value = 2
+tobj.set_default()
+tobj = new MStanWrap(tobj, 0)
+bild.subsets.snlist.object(0).ml.append(tobj)
+}
+{
+tobj = new MechanismStandard("pas")
+tobj.set("g_pas", 1e-05, 0)
+tobj.set("e_pas", -65, 0)
+tobj = new MStanWrap(tobj, 1)
+bild.subsets.snlist.object(2).ml.append(tobj)
+}
+{
+tobj = new GeoSpec(1)
+tobj.value = 0.01
+tobj.set_default()
+tobj = new MStanWrap(tobj, 0)
+bild.subsets.snlist.object(2).ml.append(tobj)
+}
+{
+tobj = new MechanismStandard("hh")
+tobj.set("gnabar_hh", 1.2, 0)
+tobj.set("gkbar_hh", 0.003, 0)
+tobj.set("gl_hh", 0.001, 0)
+tobj.set("el_hh", -54.3, 0)
+tobj = new MStanWrap(tobj, 1)
+bild.subsets.snlist.object(3).ml.append(tobj)
+}
+{
+tobj = new MechanismStandard("hh")
+tobj.set("gnabar_hh", 0.6, 0)
+tobj.set("gkbar_hh", 0.046, 0)
+tobj.set("gl_hh", 0.001, 0)
+tobj.set("el_hh", -54.3, 0)
+tobj = new MStanWrap(tobj, 1)
+bild.topol.slist.object(6).ml.append(tobj)
+}
+{
+tobj = new MechanismStandard("hh")
+tobj.set("gnabar_hh", 0.4, 0)
+tobj.set("gkbar_hh", 0.06, 0)
+tobj.set("gl_hh", 0.001, 0)
+tobj.set("el_hh", -54.3, 0)
+tobj = new MStanWrap(tobj, 1)
+bild.topol.slist.object(7).ml.append(tobj)
+}
+{
+tobj = new MechanismStandard("hh")
+tobj.set("gnabar_hh", 0.3, 0)
+tobj.set("gkbar_hh", 0.171, 0)
+tobj.set("gl_hh", 0.001, 0)
+tobj.set("el_hh", -54.3, 0)
+tobj = new MStanWrap(tobj, 1)
+bild.topol.slist.object(8).ml.append(tobj)
+}
+{
+tobj = new MechanismStandard("hh")
+tobj.set("gnabar_hh", 0.24, 0)
+tobj.set("gkbar_hh", 0.185, 0)
+tobj.set("gl_hh", 0.001, 0)
+tobj.set("el_hh", -54.3, 0)
+tobj = new MStanWrap(tobj, 1)
+bild.topol.slist.object(9).ml.append(tobj)
+}
+{
+tobj = new MechanismStandard("hh")
+tobj.set("gnabar_hh", 0.2, 0)
+tobj.set("gkbar_hh", 0.2, 0)
+tobj.set("gl_hh", 0.001, 0)
+tobj.set("el_hh", -54.3, 0)
+tobj = new MStanWrap(tobj, 1)
+bild.topol.slist.object(10).ml.append(tobj)
+}
+{
+tobj = new MechanismStandard("hh")
+tobj.set("gnabar_hh", 0.2, 0)
+tobj.set("gkbar_hh", 0.218, 0)
+tobj.set("gl_hh", 0.001, 0)
+tobj.set("el_hh", -54.3, 0)
+tobj = new MStanWrap(tobj, 1)
+bild.topol.slist.object(11).ml.append(tobj)
+}
+{
+tobj = new MechanismStandard("hh")
+tobj.set("gnabar_hh", 0.2, 0)
+tobj.set("gkbar_hh", 0.24, 0)
+tobj.set("gl_hh", 0.001, 0)
+tobj.set("el_hh", -54.3, 0)
+tobj = new MStanWrap(tobj, 1)
+bild.topol.slist.object(12).ml.append(tobj)
+}
+{
+tobj = new MechanismStandard("hh")
+tobj.set("gnabar_hh", 0.15, 0)
+tobj.set("gkbar_hh", 0.185, 0)
+tobj.set("gl_hh", 0.001, 0)
+tobj.set("el_hh", -54.3, 0)
+tobj = new MStanWrap(tobj, 1)
+bild.topol.slist.object(13).ml.append(tobj)
+}
+{
+tobj = new MechanismStandard("hh")
+tobj.set("gnabar_hh", 0.12, 0)
+tobj.set("gkbar_hh", 0.15, 0)
+tobj.set("gl_hh", 0.001, 0)
+tobj.set("el_hh", -54.3, 0)
+tobj = new MStanWrap(tobj, 1)
+bild.topol.slist.object(14).ml.append(tobj)
+}
+{object_pop()}
+{
+}
+{object_push(manage)}
+{
+first = 0
+classname = "Cell"
+etop=1 esub=1 egeom=1 emem=1
+itop=1 isub=0 igeom=0 imem=0
+bild.topol.names_off = 0
+bild.topol.circles_off = 0
+}
+{object_pop()}
+{
+cexport()
+}
+{object_pop()}
+{
+save_window_=ocbox_.gtopol
+save_window_.size(-200,200,-150,150)
+scene_vector_[2] = save_window_
+ocbox_.gtopol = save_window_
+save_window_.save_name("ocbox_.gtopol")
+}
+{
+ocbox_.map("CellBuild[0]", 174, 103, 842.88, 246.72)
+}
+objref ocbox_
+//End CellBuild[0]
+
+{WindowMenu[0].ses_gid(1, 0, 0, "presynaptic ending")}
+objectvar scene_vector_[1]
+{doNotify()}

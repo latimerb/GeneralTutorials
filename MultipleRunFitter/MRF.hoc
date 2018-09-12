@@ -1,0 +1,254 @@
+// try to do run fitter tutorial programatically
+
+// Step 1. Create an "unoptimized" model
+
+	load_file("nrngui.hoc")
+	load_file("rawmodel.ses")
+	
+	v_init = -70
+	tstop = 200
+	dt = 0.025
+
+//  Step 2. Set up a current clamp experiment on this model
+
+	objref Istim
+	soma Istim = new IClamp(0.5)
+	Istim.dur = 0.5
+	Istim.del = 1
+	Istim.amp = 1
+	
+	objref VB, g[2], tvec[2], ivec, vvec
+	
+	tvec[0] = new Vector()
+	tvec[1] = new Vector()
+	ivec = new Vector()
+	vvec = new Vector()
+	cvode.active(1)		// using the adaptive time step integrator will result in slightly 
+				// different error values from the tutorial, but the computation is 
+				// much faster; to get the indentical results as the tutoiral, 
+				// set cvode.active(0)
+	soma cvode.record(&v(0.5),vvec,tvec[0])
+	cvode.record(&Istim.i,ivec,tvec[1])
+	
+	VB = new VBox()
+	VB.intercept(1)
+	g[0] = new Graph()
+	g[1]= new Graph()
+	VB.intercept(0)
+	VB.map()
+	
+	run()
+	
+	vvec.line(g[0],tvec[0])
+	ivec.line(g[1],tvec[1])
+	
+	g[0].size(0,10,-70,-66)
+	g[1].size(0,10,0,2)
+
+// "What about input resistance?"
+
+	load_file("rn.hoc")	// from tutorial
+	print "DC input resistance of cell is ", rn(), "MOhms"
+
+// Step 3A. Create a Multiple Run Fitter
+	load_file("mulfit.hoc")
+
+	/* makemulrunfitter()
+	Calling this proc also clears the object name "tobj" so that is only 
+	referenced by the GUI, so it is not possible to access it programmatically.
+	Therefore, create it manually.
+	*/
+
+	objref MRF
+	MRF = new MulRunFitter()
+
+// Step 3B. Add generator; requires "addgen" to be declared a public function of ParmFitnessGUI (eparmlst.hoc)
+	MRF.p.addgen(0)
+
+/*
+// Step 3C. change title; required only for replicating tutorial
+	MRF.p.pf.title = "iclamp"
+	MRF.p.mulfit.title = "iclamp"
+*/
+
+// Step 3D. Diplay generator; requires that these be made public also
+	MRF.p.gmode = 1
+	MRF.p.gmodestr="Display"
+	MRF.p.gensel(0,1)	// the selected generator is the 0th index (for this exercise only when we have one generator!)
+				// in the GUI, the browser.accept_action() dumps the list index into hoc_ac_
+
+// Step 3D3.  Select variable to fit
+	MRF.p.pf.generatorlist.object(0).gen.add("soma.v(0.5)", new RegionFitness())
+	MRF.p.pf.generatorlist.object(0).gen.fitdeck(0) // update GUI box to reflect fit variable; 
+							// req fitdeck() be declared a public member of FitnessGenerator in "eonerun.hoc"
+							// necessary only for demo purposes
+
+	// to refresh Run Fitness Generator window, close and re-open it; not strictly necessary for mere programmatic control
+	MRF.p.dgen()		// close window; dgen() declared a public member of ParmFitnessGui in "eparmlst.hoc"
+	MRF.p.gensel(0,1)	// re-open it
+
+// Step4A. read data ("iclamp.dat") from file
+	
+	objref f1, orig_data
+	orig_data = new Matrix()
+	f1 = new File()
+	f1.ropen("iclamp.dat")
+	orig_data.scanf(f1)
+	f1.close()
+	// orig_data.printf()	// uncomment to test data import success
+
+
+	/*
+	"iclamp.dat" originally had a label:str for its first line, thus preventing us from using the simpler 
+	file-IO idiom above. We could use the built-in clipboard_retrieve() function (include 
+	"stdlib.hoc" if not already) which takes care of this for us at the cost of one bit of 
+	user-intervention.  To use the above approach, I manually deleted the first line of "iclamp.dat"
+	and added nrow/tncol as the first line (i.e. "8001	2")
+	
+	clipboard_retrieve()
+	*/
+
+// put data on clipboard
+	for i = 0,1 {hoc_obj_[i] = new Vector()}
+	hoc_obj_[0].copy(orig_data.getcol(1))	// y data
+	hoc_obj_[1].copy(orig_data.getcol(0))	// x data
+
+// pull data into RegionFitness from clipboard
+	MRF.p.pf.generatorlist.object(0).gen.fitnesslist.object(0).clipboard_data()
+
+// Step 4B.  Test the run fitness generator
+	MRF.p.pf.generatorlist.object(0).gen.efun()
+
+// Step 5A.  Create proxy parameters and custom init() procedure
+	load_file("params.hoc")
+
+// test proxy parameters
+	rn()
+	//forall print secname(), " ", g_pas
+	Rm *= 2
+	rn()
+	//forall print secname(), " ", g_pas
+
+	// undo doubling to get in sync with tutorial
+	Rm /= 2
+
+// use the proxy parameters
+	objref xobj, proxies
+	strdef xstr
+	proxies = new List()
+	proxies.append(new String("Ri"))
+	proxies.append(new String("Cm"))
+	proxies.append(new String("Rm"))
+
+	for i = 0,proxies.count()-1 {	// the gist of ParmFitnessGUI.addarg(), without displaying the SymChooser to interactively query the user
+		xstr = proxies.object(i).s
+		xobj = new RunFitParm(xstr)	// this might cause problems later, the object is declared at the top-level, not within the ParmFitnessGui object
+		MRF.p.pf.declare(xobj)
+		MRF.p.pf.parmlist.append(xobj)
+		sprint(xstr, "%s.val = %s", xobj, xstr)
+		execute1(xstr)			// not sure why this doesn't have to be executed in the context of the ParmFitnessGui object		
+	}
+
+// Step 5B.  Display parameter panel, only for replicating tutorial
+	MRF.p.showargs()
+
+// increase Rm to 10000
+	MRF.p.pf.parmlist.object(2).val = 10000
+	MRF.p.pf.parmlist.object(2).play_one()
+
+// check error value
+	MRF.p.pf.generatorlist.object(0).gen.efun()
+
+// return Rm to 1000 to stay in synch with tutorial
+	MRF.p.pf.parmlist.object(2).val = 1000
+	MRF.p.pf.parmlist.object(2).play_one()
+
+// check error value
+	MRF.p.pf.generatorlist.object(0).gen.efun()
+
+// Step 5C.  Constrain parameters to use positive definite limits and log scaling
+	MRF.p.showdomain()
+	MRF.p.uselog(1)	// add uselog() to public members of ParmFitnessGui
+	MRF.p.limits(1e-9,1e9)	// add uselog() to public members of ParmFitnessGui
+
+// toggle to use generator
+	MRF.p.gmode = 2
+	MRF.p.gmodestr="Toggle"
+	MRF.p.gensel(0,1)
+
+// Step 6A.  run again
+	MRF.p.run()
+	
+// Step 6B.  Choose and use optimizer
+	sprint(xstr, "mulfit.opt = new %s(pf)", mulfit_optimizers_.object(0).s)
+	execute(xstr, MRF.p)
+	MRF.p.mulfit.showopt()
+
+// change "# of quad forms before return"
+	MRF.opt.nstep = 1
+
+// run optimizer 3X as in tutorial
+	MRF.prun()
+	MRF.prun()
+	MRF.prun()
+
+// check rn(); the results are slightly different due to using the variable time step [change cvode.active(0) to exactly replicate tutorial results, but it will take longer to compute]
+	print "somatic input resistance [ie. output of rn()]: ", rn(), " MOhms"
+
+// "A minimal principled strategy"
+/*
+	// reset parameters to their initial values
+		Ri = 80    // ohm cm
+		Cm = 1     // uf/cm2
+		Rm = 1000  // ohm cm2
+
+	// optimize Rm only; turn off Ri and Cm...
+		MRF.p.pf.parmlist.object(0).doarg = 0
+		MRF.p.pf.parmlist.object(1).doarg = 0
+
+	// ...and run a few times
+		for i = 0,8 {MRF.prun()}
+
+	// Now turn off Rm...
+		MRF.p.pf.parmlist.object(2).doarg = 0
+
+	// ...turn Ri and Cm back on...
+		MRF.p.pf.parmlist.object(0).doarg = 1
+		MRF.p.pf.parmlist.object(1).doarg = 1
+
+	// ...and run a few more times
+		for i = 0,2 {MRF.prun()}
+
+	// Finally, optimize all at once...
+		for i = 0,2 {MRF.p.pf.parmlist.object(i).doarg = 1}
+
+	// ...and run a few more times
+		for i = 0,4 {MRF.prun()}
+
+	print "somatic input resistance [ie. output of rn()]: ", rn(), " MOhms"
+*/
+
+// adjust regions
+	// reset parameters to their initial values
+		Ri = 80    // ohm cm
+		Cm = 1     // uf/cm2
+		Rm = 1000  // ohm cm2
+
+	// zoom-in
+		MRF.p.pf.generatorlist.object(0).gen.fitnesslist.object(0).g.size(0,25,-70,-65.5)
+
+	// set region to optimize from 1 to 10 msec (only one region with weight of 1)
+
+		proc get_region_info() {
+			print "bounds: ", MRF.p.pf.generatorlist.object(0).gen.fitnesslist.object(0).boundary.printf()
+			print "weights: ", MRF.p.pf.generatorlist.object(0).gen.fitnesslist.object(0).weight.printf()
+		}
+		//get_region_info()
+
+		MRF.p.pf.generatorlist.object(0).gen.fitnesslist.object(0).boundary.x[0] = 1
+		MRF.p.pf.generatorlist.object(0).gen.fitnesslist.object(0).boundary.x[1] = 10
+
+	// try a few runs
+		for i = 0,9 {MRF.prun()}
+
+//allobjectvars()

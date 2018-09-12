@@ -1,0 +1,6 @@
+load_file("nrngui.hoc")
+load_file("init.hoc")
+forall insert extracellular
+load_file("fig13.ses")
+run()
+

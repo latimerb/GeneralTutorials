@@ -1,0 +1,19 @@
+load_file("nrngui.hoc")
+// use rallbranch to create 3-virtual ending branches
+load_file("ending.ses")
+ax[0].rallbranch = 3
+topology()
+print "section diam L"
+forall print secname(), " ", diam, L
+print "section gnabar_hh gkbar_hh"
+forsec all_active print secname(), " ", gnabar_hh, gkbar_hh
+
+proc init() {
+	finitialize(v_init)
+	fcurrent()
+	forsec all_active {
+		el_hh = (ina + ik)/gl_hh + v_init
+	}
+	fcurrent()
+}
+

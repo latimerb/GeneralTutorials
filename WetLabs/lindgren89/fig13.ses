@@ -1,0 +1,89 @@
+objectvar save_window_, rvp_
+objectvar scene_vector_[6]
+objectvar ocbox_, ocbox_list_, scene_, scene_list_
+{ocbox_list_ = new List()  scene_list_ = new List()}
+
+//Begin PointProcessManager
+{
+load_file("pointman.hoc")
+}
+{
+node[0] ocbox_ = new PointProcessManager(0)
+}
+{object_push(ocbox_)}
+{
+mt.select("IClamp") i = mt.selected()
+ms[i] = new MechanismStandard("IClamp")
+ms[i].set("del", 0, 0)
+ms[i].set("dur", 0.5, 0)
+ms[i].set("amp", 0.1, 0)
+mt.select("IClamp") i = mt.selected() maction(i)
+hoc_ac_ = 0.5
+sec.sec move() d1.flip_to(0)
+}
+{object_pop() doNotify()}
+{
+ocbox_ = ocbox_.v1
+ocbox_.map("PointProcessManager", 2, 528, 222.3, 425.7)
+}
+objref ocbox_
+//End PointProcessManager
+
+{
+save_window_ = new Graph(0)
+save_window_.size(0,2,-3,1)
+scene_vector_[4] = save_window_
+{save_window_.view(0, -3, 2, 4, 783, 4, 324.9, 441.1)}
+graphList[0].append(save_window_)
+save_window_.save_name("graphList[0].")
+save_window_.addvar("heminode.i_membrane(0.5)", 2, 1, 0.14072, 0.0879393, 2)
+save_window_.addvar("bouton[0].i_membrane(0.5)", 3, 1, 0.293075, 1.0061, 2)
+save_window_.addvar("bouton[1].i_membrane(0.5)", 4, 1, 0.489751, 0.995897, 2)
+save_window_.addvar("bouton[2].i_membrane(0.5)", 5, 1, 0.586704, 0.979574, 2)
+save_window_.addvar("bouton[3].i_membrane(0.5)", 6, 1, 0.650416, 0.963251, 2)
+}
+{
+save_window_ = new Graph(0)
+save_window_.size(0,2,-80,40)
+scene_vector_[5] = save_window_
+{save_window_.view(0, -80, 2, 120, 291, 102, 354.6, 282.7)}
+graphList[0].append(save_window_)
+save_window_.save_name("graphList[0].")
+save_window_.addvar("heminode.v(1)", 2, 1, 0.708629, 0.928652, 2)
+save_window_.addvar("bouton[0].v(0.5)", 3, 1, 0.731472, 0.925469, 2)
+save_window_.addvar("bouton[1].v(0.5)", 4, 1, 0.749239, 0.912734, 2)
+save_window_.addvar("bouton[2].v(0)", 5, 1, 0.769543, 0.903184, 2)
+save_window_.addvar("bouton[3].v(0.5)", 6, 1, 0.8, 0.896816, 2)
+}
+{
+xpanel("RunControl", 0)
+v_init = -65
+xvalue("Init","v_init", 1,"stdinit()", 1, 1 )
+xbutton("Init & Run","run()")
+xbutton("Stop","stoprun=1")
+runStopAt = 5
+xvalue("Continue til","runStopAt", 1,"{continuerun(runStopAt) stoprun=1}", 1, 1 )
+runStopIn = 1
+xvalue("Continue for","runStopIn", 1,"{continuerun(t + runStopIn) stoprun=1}", 1, 1 )
+xbutton("Single Step","steprun()")
+t = 2
+xvalue("t","t", 2 )
+tstop = 2
+xvalue("Tstop","tstop", 1,"tstop_changed()", 0, 1 )
+dt = 0.01
+xvalue("dt","dt", 1,"setdt()", 0, 1 )
+steps_per_ms = 100
+xvalue("Points plotted/ms","steps_per_ms", 1,"setdt()", 0, 1 )
+xcheckbox("Quiet",&stdrun_quiet,"")
+realtime = 1
+xvalue("Real Time","realtime", 0,"", 0, 1 )
+xpanel(1,98)
+}
+{
+xpanel("Temperature", 0)
+celsius = 20
+xvalue("celsius","celsius", 1,"", 0, 1 )
+xpanel(379,0)
+}
+objectvar scene_vector_[1]
+{doNotify()}

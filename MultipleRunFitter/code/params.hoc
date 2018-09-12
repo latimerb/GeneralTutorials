@@ -1,0 +1,20 @@
+// proxies for NEURON's Ra, cm, g_pas
+Ri = 80    // ohm cm
+Cm = 1     // uf/cm2
+Rm = 1000  // ohm cm2
+
+proc init() {
+  // optimizer adjusts Ri, Cm, Rm, but NEURON uses Ra, cm, g_pas
+  forall {
+    Ra = Ri
+    cm = Cm
+    g_pas = 1/Rm
+  }
+  finitialize(v_init)
+  if (cvode.active()) {
+    cvode.re_init()
+  } else {
+    fcurrent()
+  }
+  frecord_init()
+}

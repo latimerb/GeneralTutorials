@@ -1,0 +1,6 @@
+load_file("nrngui.hoc")
+load_file("rawmodel.ses")
+load_file("iclamp_rig.ses")
+load_file("rn.hoc")
+load_file("params.hoc")
+load_file("iclampfit.ses")

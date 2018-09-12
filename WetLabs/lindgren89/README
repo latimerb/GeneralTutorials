@@ -1,0 +1,19 @@
+Lindgren and Moore. (1989) Identification of ionic currents at
+presynaptic nerve terminal of the lizard.
+J. Physiol. 414: 201-222
+
+Experimental observations of ionic currents localized in the presynaptic
+terminal region were made with a focal loose-patch clamp.  In addition
+to finding Hodgkin-Huxley (HH) type sodium and potassium currents an L
+type calcium channel and a calcium-activated potassium channel were
+identified. 
+
+Computer simulations matching the invasion of the action potential
+(figure 2) and the major current patterns (figure 1) were able to be
+generated, using only the Na and K channels of HH
+
+The NEURON implementation of this model was prepared by Michael Hines. 
+Questions about details of this implementation should be addressed to
+him at michael.hines@yale.edu. 
+
+
