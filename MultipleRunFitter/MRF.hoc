@@ -3,7 +3,7 @@
 // Step 1. Create an "unoptimized" model
 
 	load_file("nrngui.hoc")
-	load_file("rawmodel.ses")
+	load_file("./code/rawmodel.ses")
 	
 	v_init = -70
 	tstop = 200
@@ -47,7 +47,7 @@
 
 // "What about input resistance?"
 
-	load_file("rn.hoc")	// from tutorial
+	load_file("./code/rn.hoc")	// from tutorial
 	print "DC input resistance of cell is ", rn(), "MOhms"
 
 // Step 3A. Create a Multiple Run Fitter
