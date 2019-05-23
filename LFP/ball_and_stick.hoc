@@ -12,4 +12,3 @@ dend[0] {
 
 connect soma[0](1), dend[0](0)
 
-

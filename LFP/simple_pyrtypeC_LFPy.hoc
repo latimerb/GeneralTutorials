@@ -1,0 +1,186 @@
+/* ----------------------------------------------------
+example_morphology.hoc
+
+This hoc file creates a neuron of the following shape:
+
+
+                |
+                |
+                |
+                O
+                
+Note the conventions:
+ - soma needs to be a list (soma[0], not soma),
+ - use soma for the soma compartment,
+ - use a name starting with dend for the dendrites.
+-----------------------------------------------------*/
+
+
+create soma[1]
+create dend[2]
+create axon[11]
+
+soma[0] {
+    pt3dadd(0, 0, 0, 24.75)
+    pt3dadd(0, 0, 25, 24.75)
+    nseg = 1
+}
+
+dend[0] {
+    pt3dadd(0, 0, 25, 5)
+    pt3dadd(0, 0, 580, 5)
+    nseg = 7
+}
+
+dend[1] {
+    pt3dadd(0, 0, 0, 3)
+    pt3dadd(0, 0, -270, 3)
+    nseg = 8    
+}
+
+for i=1,10{
+	axon[i-1] {
+	    pt3dadd(-5*(i-1), 0, 0, 0.5)
+	    pt3dadd(-5*(i-1)-5, 0, 0, 0.5)
+	}
+}
+
+axon[10]{
+	pt3dadd(-50,0,0,0.5)
+	pt3dadd(-150,0,0,0.5)
+}
+
+connect dend[0](0), soma[0](1)
+connect dend[1](0), soma[0](0)
+connect axon[0](0), soma[0](0)
+for i=1,10{connect axon[i](0), axon[i-1](1)}
+
+Cm = 2.4
+RaAll= 150
+RaSoma= 150
+RaDend = 150
+RaAx = 150
+
+RmAx = 1000
+
+gna = 0.015 
+gnap = 0.000559 // 0.000551 
+gkdr = 0.002 //0.002 
+ghd = 1.5e-5 //1.5e-5
+gca = 5.5e-4 
+gm = 0.00224 // 0.00222  
+gsAHP = 0.0002//0.0019
+gkap = 0.002 
+gleak = 2.5e-5
+gleak_dend=1.57*3.0e-5
+			
+nash=10
+Vrest = -70
+celsius = 31.0 
+
+gna12_ais_max = 3000   // Nav1.2 
+gna16_ais_max = 3200   // Nav1.6
+gkv_axon = 1000
+
+dend[0]{
+	insert leak el_leak = -72  glbar_leak = gleak_dend Ra=RaDend cm = Cm
+	insert cadyn gcabar_cadyn = gca eca = 120
+	insert hd ghdbar_hd = ghd 
+	insert na3 sh_na3=nash ar_na3=1	gbar_na3 = gna
+	insert nap gbar_nap = 0  gbar_nap(1/(2*nseg)) = 0.8*gnap
+	insert kdr gbar_kdr = gkdr
+	insert capool taucas = 1000  fcas_capool = 0.05 
+	insert sAHP gsAHPbar_sAHP = 0
+	insert im gbar_im = 0 gbar_im(1/(2*nseg)) = 0.8*gm
+	insert kap gkabar_kap = 0
+	
+}
+
+dend[1]{
+	insert leak el_leak= -72  glbar_leak = gleak_dend  Ra=RaAll cm = Cm
+	insert cadyn gcabar_cadyn = gca  eca = 120	
+	insert hd ghdbar_hd = ghd
+	insert na3 sh_na3=nash ar_na3=1	gbar_na3 = gna
+	insert nap gbar_nap = 0 gbar_nap(1/(2*nseg)) = 1.0*gnap
+	insert kdr gbar_kdr = gkdr
+	insert capool taucas = 1000  fcas_capool = 0.05 
+	insert sAHP gsAHPbar_sAHP = 0
+	insert im gbar_im = 0 gbar_im(1/(2*nseg)) = 1.0*gm
+	insert kap gkabar_kap = gkap
+}
+
+soma[0]{	
+	insert leak el_leak= -72  glbar_leak = gleak   Ra=RaSoma cm = Cm
+	insert cadyn gcabar_cadyn = gca  eca = 120	
+	insert hd ghdbar_hd = ghd 
+	insert na3 sh_na3=nash ar_na3=1	gbar_na3 = 3*gna
+	insert nap gbar_nap = gnap
+	insert kdr gbar_kdr = gkdr
+	insert capool taucas = 1000  fcas_capool = 0.05 //only in dend and p_dend
+	insert sAHP gsAHPbar_sAHP = gsAHP
+	insert im gbar_im = gm
+	insert kap gkabar_kap = gkap
+	
+}
+
+for i=0,9 axon[i] {
+	insert pas
+	Ra = RaAx//50000
+	cm = 0.8 
+	g_pas = 1/(RmAx+200)
+	e_pas = -70
+	insert na12  //gbar_na12=0
+	insert na16  //gbar_na16=0
+	insert kv    //gbar_kv = 0
+	ena = 45
+	ek = -90
+}
+
+axon[10]{
+	insert pas
+	Ra = RaAx
+	cm = 0.2 //myelin 
+	g_pas = 1/RmAx
+	e_pas = -70
+	insert na12  
+	insert na16  
+	insert kv    
+	ena = 45
+	ek = -90
+}
+	
+axon[0].gbar_na12 = gna12_ais_max*0.96*1
+axon[1].gbar_na12 = gna12_ais_max*0.9*1                      
+axon[2].gbar_na12 = gna12_ais_max*0.75*1                    
+axon[3].gbar_na12 = gna12_ais_max*0.55*0.95              
+axon[4].gbar_na12 = gna12_ais_max*0.366985879*0.880142857  
+axon[5].gbar_na12 = gna12_ais_max*0.2*0.75                 
+axon[6].gbar_na12 = gna12_ais_max*0.100330761*0.647857143  
+axon[7].gbar_na12 = gna12_ais_max*0.011532125*0.520285714 
+axon[8].gbar_na12 = gna12_ais_max*0*0.428571429            
+axon[9].gbar_na12 = gna12_ais_max*0*0.342857143 
+axon[10].gbar_na12 = gna12_ais_max*0*0.342857143 
+	
+axon[0].gbar_na16 = gna16_ais_max	*	0.04	*	1   
+axon[1].gbar_na16 = gna16_ais_max	*	0.1	*	1   
+axon[2].gbar_na16 = gna16_ais_max	*	0.25	*	1   
+axon[3].gbar_na16 = gna16_ais_max	*	0.45	*	0.95   
+axon[4].gbar_na16 = gna16_ais_max	*	0.633014121	*	0.880142857   
+axon[5].gbar_na16 = gna16_ais_max	*	0.8	*	0.75   
+axon[6].gbar_na16 = gna16_ais_max	*	0.899669239	*	0.647857143   
+axon[7].gbar_na16 = gna16_ais_max	*	0.988467875	*	0.520285714   
+axon[8].gbar_na16 = gna16_ais_max	*	1	*	0.428571429   
+axon[9].gbar_na16 = gna16_ais_max	*	1	*	0.342857143  
+axon[10].gbar_na16 = gna16_ais_max	*	1	*	0.342857143  
+				
+axon[0].gbar_kv = gkv_axon	*	0.2 
+axon[1].gbar_kv = gkv_axon	*	0.3 
+axon[2].gbar_kv = gkv_axon	*	0.4 
+axon[3].gbar_kv = gkv_axon	*	0.5 
+axon[4].gbar_kv = gkv_axon	*	0.6 
+axon[5].gbar_kv = gkv_axon	*	0.7 
+axon[6].gbar_kv = gkv_axon	*	0.8 
+axon[7].gbar_kv = gkv_axon	*	0.9
+axon[8].gbar_kv = gkv_axon	*	1
+axon[9].gbar_kv = gkv_axon	*	1
+axon[10].gbar_kv = gkv_axon	*	1

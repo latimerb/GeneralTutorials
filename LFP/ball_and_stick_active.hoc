@@ -1,0 +1,29 @@
+create soma[1], dend[1]
+
+soma[0] {
+    pt3dadd(0, 0, 0, 25)
+    pt3dadd(0, 0, 25, 25)
+}
+
+dend[0] {
+    pt3dadd(0,0,25,10)
+    pt3dadd(0,0,525,10)
+}
+
+connect soma[0](1), dend[0](0)
+
+soma[0]{
+    insert hh
+    insert pas
+    //gnabar_hh=0.12
+    //gkbar_hh=0.001
+    //glbar_hh=2.5e-5
+}
+
+dend[0]{
+    //insert hh
+    insert pas
+    //gnabar_hh=0.12
+    //gkbar_hh=0.001
+    //glbar_hh=3e-5
+}
