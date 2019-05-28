@@ -1,0 +1,16 @@
+create soma[1]
+
+soma[0] {
+    pt3dadd(0, 0, 0, 10)
+    pt3dadd(0, 0, 500, 10)
+}
+
+soma[0] {
+    insert hh
+    insert pas
+    g_pas = 2.0e-5
+    e_pas = -70
+    gnabar_hh = 0.12
+    gkbar_hh = 0.012
+    gl_hh = 0
+}
