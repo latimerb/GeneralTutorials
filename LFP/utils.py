@@ -139,7 +139,7 @@ def Plot_active_currs_volt(cell,electrode,synapse):
 	plt.xlabel('distance (um)')
 	plt.ylabel('distance (um)')
 
-	plt.ylim(-450,450)
+	plt.ylim(-450,1200)
 	plt.xlim(-350,100)
 	plt.legend()
 
@@ -183,7 +183,7 @@ def Plot_active_currs_volt(cell,electrode,synapse):
 	#dist = np.log((np.sqrt(h**2+r**2)-h)/(np.sqrt(l**2+r**2)-l))
 	#v_ext=1000*(1/(4*np.pi*300*5))*np.dot(np.transpose(cell.imem),dist)
 
-	elecs_to_plot = [8,5,0]
+	elecs_to_plot = [12,5,0]
 	for i in np.arange(1,4):
 	    ax=plt.subplot(3,3,3*i)
 	    plt.plot(cell.tvec,electrode.LFP[elecs_to_plot[i-1],:],'k')
@@ -195,4 +195,4 @@ def Plot_active_currs_volt(cell,electrode,synapse):
 		plt.title('extracellular voltage (mV)')
 	    if i==3:
 		plt.xlabel('time(ms)')
-	    plt.ylim(-0.0001,0.0001)	
+	    plt.ylim(-0.001,0.001)	
