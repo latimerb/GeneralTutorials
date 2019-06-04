@@ -40,14 +40,14 @@ dend[1] {
 
 for i=1,10{
 	axon[i-1] {
-	    pt3dadd(-5*(i-1), 0, 0, 0.5)
-	    pt3dadd(-5*(i-1)-5, 0, 0, 0.5)
+	    pt3dadd(-5*(i-1), 0, 0, 1.0)
+	    pt3dadd(-5*(i-1)-5, 0, 0, 1.0)
 	}
 }
 
 axon[10]{
-	pt3dadd(-50,0,0,0.5)
-	pt3dadd(-150,0,0,0.5)
+	pt3dadd(-50,0,0,1.0)
+	pt3dadd(-150,0,0,1.0)
 }
 
 connect dend[0](0), soma[0](1)

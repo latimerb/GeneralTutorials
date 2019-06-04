@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import LFPy 
+import neuron
+from matplotlib.collections import LineCollection
 
 def Plot_geo_currs_volt(cell,electrode,synapse):
 
@@ -196,3 +198,375 @@ def Plot_active_currs_volt(cell,electrode,synapse):
 	    if i==3:
 		plt.xlabel('time(ms)')
 	    plt.ylim(-0.001,0.001)	
+
+def plot_ex1(cell, electrode, X, Y, Z, time_show):
+    '''
+    plot the morphology and LFP contours, synaptic current and soma trace
+    '''
+	#figure object
+    fig = plt.figure(figsize=(15, 7))
+    fig.subplots_adjust(left=None, bottom=None, right=None, top=None, 
+		    wspace=0.2, hspace=0.2)
+    for i in np.arange(0,len(time_show)):
+		#some plot parameters
+		t_show = time_show[i] #time point to show LFP
+		tidx = np.where(cell.tvec == t_show)
+		#contour lines:
+		n_contours = 200
+		n_contours_black = 0
+		
+		#This is the extracellular potential, reshaped to the X, Z mesh
+		LFP = np.arcsinh(electrode.LFP[:, tidx]).reshape(X.shape)
+		
+		# Plot LFP around the cell with in color and with equipotential lines
+		ax1 = fig.add_subplot(1,len(time_show),i+1)
+		
+		#plot_morphology(plot_synapses=True)
+		for sec in LFPy.cell.neuron.h.allsec():
+		    idx = cell.get_idx(sec.name())
+		    ax1.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
+		            np.r_[cell.zstart[idx], cell.zend[idx][-1]],
+		            color='k')
+		for i in range(len(cell.synapses)):
+		    ax1.plot([cell.synapses[i].x], [cell.synapses[i].z], '.',
+		        #color=cell.synapses[i].color, marker=cell.synapses[i].marker, 
+		        markersize=10)
+		
+		#contour lines
+		ct1 = ax1.contourf(X, Z, LFP, n_contours)
+		ct1.set_clim((-0.00007, 0.00002))
+		ct2 = ax1.contour(X, Z, LFP, n_contours_black, colors='k')
+		
+
+		# Figure formatting and labels
+		
+		ax1.set_title('LFP at t=' + str(t_show) + ' ms', fontsize=12)
+		ax1.set_xticks([])
+		ax1.set_xticklabels([])
+		ax1.set_yticks([])
+		ax1.set_yticklabels([])
+		ax1.set_xlim(-900,400)
+		#ax1.set_ylim(-500,100)
+		
+		if i==0:
+			ax1.plot([-600, -600], [-600, -400], color='k', lw=2)
+			ax1.text(-580, -500, '200 um')
+
+    fig2 = plt.figure(figsize=(15, 6))
+    # Plot synaptic input current
+    ax2 = fig2.add_subplot(121)
+    ax2.plot(cell.tvec, cell.synapses[0].i)
+		
+    # Plot soma potential
+    ax3 = fig2.add_subplot(122)
+    ax3.plot(cell.tvec, cell.somav)
+
+    ax2.set_title('synaptic input current', fontsize=12)
+    ax2.set_ylabel('(nA)')
+    ax2.set_xlabel('time (ms)')
+    ax2.set_xlim(40,65)
+
+    ax3.set_title('somatic membrane potential', fontsize=12)
+    ax3.set_ylabel('(mV)')
+    ax3.set_xlabel('time (ms)')
+    ax3.set_xlim(40,65)
+    
+    return fig, fig2
+
+def plot_ex2(cell, electrode, X, Y, Z, time_show):
+    '''
+    plot the morphology and LFP contours, synaptic current and soma trace
+    '''
+	#figure object
+    fig = plt.figure(figsize=(15, 7))
+    fig.subplots_adjust(left=None, bottom=None, right=None, top=None, 
+		    wspace=0.2, hspace=0.2)
+    for i in np.arange(0,len(time_show)):
+		#some plot parameters
+		t_show = time_show[i] #time point to show LFP
+		tidx = np.where(cell.tvec == t_show)
+		#contour lines:
+		n_contours = 200
+		n_contours_black = 0
+		
+		#This is the extracellular potential, reshaped to the X, Z mesh
+		LFP = np.arcsinh(electrode.LFP[:, tidx]).reshape(X.shape)
+		
+		# Plot LFP around the cell with in color and with equipotential lines
+		ax1 = fig.add_subplot(1,len(time_show),i+1)
+		
+		#plot_morphology(plot_synapses=True)
+		for sec in LFPy.cell.neuron.h.allsec():
+		    idx = cell.get_idx(sec.name())
+		    ax1.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
+		            np.r_[cell.zstart[idx], cell.zend[idx][-1]],
+		            color='k')
+		for j in range(len(cell.synapses)):
+		    ax1.plot([cell.synapses[j].x], [cell.synapses[j].z], '.',
+		        #color=cell.synapses[j].color, marker=cell.synapses[j].marker, 
+		        markersize=10)
+		
+		#contour lines
+		ct1 = ax1.contourf(X, Z, LFP, n_contours)
+		ct1.set_clim((-0.00007, 0.00002))
+		ct2 = ax1.contour(X, Z, LFP, n_contours_black, colors='k')
+		
+
+		# Figure formatting and labels
+		
+		ax1.set_title('LFP at t=' + str(t_show) + ' ms', fontsize=12)
+		ax1.set_xticks([])
+		ax1.set_xticklabels([])
+		ax1.set_yticks([])
+		ax1.set_yticklabels([])
+		ax1.set_xlim(-900,400)
+		#ax1.set_ylim(-400,300)
+		if i==0:
+			ax1.plot([-600, -600], [-600, -400], color='k', lw=2)
+			ax1.text(-580, -500, '200 um')
+
+		
+		
+    fig2 = plt.figure(figsize=(15, 6))
+    # Plot synaptic input current
+    ax2 = fig2.add_subplot(223)
+    ax2.plot(cell.tvec, cell.synapses[0].i)
+		
+    # Plot soma potential
+    ax3 = fig2.add_subplot(224)
+    ax3.plot(cell.tvec, cell.somav)
+
+    ax2.set_title('synaptic input current', fontsize=12)
+    ax2.set_ylabel('(nA)')
+    ax2.set_xlabel('time (ms)')
+
+    ax3.set_title('somatic membrane potential', fontsize=12)
+    ax3.set_ylabel('(mV)')
+    ax3.set_xlabel('time (ms)')
+    
+    return fig
+
+
+def plot_elec_grid(cell, electrode):
+    '''example2.py plotting function'''
+    #creating array of points and corresponding diameters along structure
+    for i in range(cell.xend.size):
+        if i == 0:
+            xcoords = np.array([cell.xmid[i]])
+            ycoords = np.array([cell.ymid[i]])
+            zcoords = np.array([cell.zmid[i]])
+            diams = np.array([cell.diam[i]])    
+        else:
+           # if cell.zmid[i] < 100 and cell.zmid[i] > -100 and \
+                   # cell.xmid[i] < 100 and cell.xmid[i] > -100:
+            xcoords = np.r_[xcoords, np.linspace(cell.xstart[i],
+                                            cell.xend[i], cell.length[i]*3)]   
+            ycoords = np.r_[ycoords, np.linspace(cell.ystart[i],
+                                            cell.yend[i], cell.length[i]*3)]   
+            zcoords = np.r_[zcoords, np.linspace(cell.zstart[i],
+                                            cell.zend[i], cell.length[i]*3)]   
+            diams = np.r_[diams, np.linspace(cell.diam[i], cell.diam[i],
+                                            cell.length[i]*3)]
+    
+    #sort along depth-axis
+    argsort = np.argsort(ycoords)
+    
+    #plotting
+    fig = plt.figure(figsize=[15, 10])
+    ax = fig.add_axes([0.1, 0.1, 0.533334, 0.8], frameon=False)
+    ax.scatter(xcoords[argsort], zcoords[argsort], s=diams[argsort]**2*20,
+               c=ycoords[argsort], edgecolors='none', cmap='gray')
+    ax.plot(electrode.x, electrode.z, '.', marker='o', markersize=5, color='k')
+    
+    i = 0
+    limLFP = abs(electrode.LFP).max()
+    for LFP in electrode.LFP:
+        tvec = cell.tvec*0.6 + electrode.x[i] + 2
+        if abs(LFP).max() >= 1.5e-4:
+            factor = 250000
+            color='r'
+        elif abs(LFP).max() < 12.1e-6:
+            factor = 1000000
+            color = 'b'
+        else:
+            factor = 500000
+            color = 'g'
+        trace = LFP*factor + electrode.z[i]
+        ax.plot(tvec, trace, color=color, lw = 2)
+        i += 1
+    
+    #ax.plot([22, 28], [-60, -60], color='k', lw = 3)
+    #ax.text(22, -65, '10 ms')
+    
+    #ax.plot([40, 50], [-60, -60], color='k', lw = 3)
+    #ax.text(42, -65, '10 $\mu$m')
+    
+    #ax.plot([60, 60], [20, 30], color='r', lw=2)
+    #ax.text(62, 20, '5 mV')
+    
+    #ax.plot([60, 60], [0, 10], color='g', lw=2)
+    #ax.text(62, 0, '1 mV')
+    
+    #ax.plot([60, 60], [-20, -10], color='b', lw=2)
+    #ax.text(62, -20, '0.1 mV')
+    
+    
+    
+    #ax.set_xticks([])
+    #ax.set_yticks([])
+    
+    ax.axis([-425, -25, -350, 350])
+    
+    ax.set_title('Location-dependent extracellular spike shapes')
+
+    #plotting the soma trace    
+    #ax = fig.add_axes([0.75, 0.55, 0.2, 0.35])
+    #ax.plot(cell.tvec, cell.somav)
+    #ax.set_title('Somatic action-potential')
+    #ax.set_ylabel(r'$V_\mathrm{membrane}$ (mV)')
+    
+    #plotting the synaptic current
+    #ax = fig.add_axes([0.75, 0.1, 0.2, 0.35])
+    #ax.plot(cell.tvec, cell.synapses[0].i)
+    #ax.set_title('Synaptic current')
+    #ax.set_ylabel(r'$i_\mathrm{synapse}$ (nA)')
+    #ax.set_xlabel(r'time (ms)')
+
+    return fig
+
+def plot_elec_grid2(cell, electrode):
+    '''plotting'''
+    fig = plt.figure(dpi=160)
+    
+    ax1 = fig.add_axes([0.05, 0.1, 0.55, 0.9], frameon=False)
+    cax = fig.add_axes([0.05, 0.115, 0.55, 0.015])
+    
+    ax1.plot(electrode.x, electrode.z, '.', marker='o', markersize=1, color='k',
+             zorder=0)
+    
+    #normalize to min peak
+    LFPmin = electrode.LFP.min(axis=1)
+    LFPnorm = -(electrode.LFP.T / LFPmin).T
+    
+    i = 0
+    zips = []
+    for x in LFPnorm:
+        zips.append(list(zip(cell.tvec*1.6 + electrode.x[i] + 2,
+                        x*12 + electrode.z[i])))
+        i += 1
+    
+    line_segments = LineCollection(zips,
+                                    linewidths = (1),
+                                    linestyles = 'solid',
+                                    cmap='nipy_spectral',
+                                    zorder=1,
+                                    rasterized=False)
+    line_segments.set_array(np.log10(-LFPmin))
+    ax1.add_collection(line_segments)
+    
+    axcb = fig.colorbar(line_segments, cax=cax, orientation='horizontal')
+    axcb.outline.set_visible(False)
+    xticklabels = np.array([-0.1  , -0.05 , -0.02 , -0.01 , -0.005, -0.002])
+    xticks = np.log10(-xticklabels)
+    axcb.set_ticks(xticks)
+    axcb.set_ticklabels(np.round(-10**xticks, decimals=3))  
+    axcb.set_label('spike amplitude (mV)', va='center')
+    
+    ax1.plot([22, 38], [100, 100], color='k', lw = 1)
+    ax1.text(22, 102, '10 ms')
+    
+    ax1.plot([60, 80], [100, 100], color='k', lw = 1)
+    ax1.text(60, 102, '20 $\mu$m')
+    
+    ax1.set_xticks([])
+    ax1.set_yticks([])
+    
+    axis = ax1.axis(ax1.axis('equal'))
+    ax1.set_xlim(axis[0]*1.02, axis[1]*1.02)
+    
+    # plot morphology
+    zips = []
+    for x, z in cell.get_pt3d_polygons():
+        zips.append(list(zip(x, z)))
+    from matplotlib.collections import PolyCollection
+    polycol = PolyCollection(zips, edgecolors='none',
+                             facecolors='gray', zorder=-1, rasterized=False)
+    ax1.add_collection(polycol)
+
+    ax1.text(-0.05, 0.95, 'a',
+        horizontalalignment='center',
+        verticalalignment='center',
+        fontsize=16, fontweight='demibold',
+        transform=ax1.transAxes)
+    
+
+    # plot extracellular spike in detail
+    ind = np.where(electrode.LFP == electrode.LFP.min())[0][0]
+    timeind = (cell.tvec >= 0) & (cell.tvec <= 10)
+    xticks = np.arange(10)
+    xticklabels = xticks
+    LFPtrace = electrode.LFP[ind, ]
+    vline0 = cell.tvec[cell.somav==cell.somav.max()]
+    vline1 = cell.tvec[LFPtrace == LFPtrace.min()]
+    vline2 = cell.tvec[LFPtrace == LFPtrace.max()]
+    
+    # plot asterix to link trace in (a) and (c)
+    ax1.plot(electrode.x[ind], electrode.z[ind], '*', markersize=5, 
+             markeredgecolor='none', markerfacecolor='k')
+    
+    ax2 = fig.add_axes([0.75, 0.6, 0.2, 0.35], frameon=True)
+    ax2.plot(cell.tvec[timeind], cell.somav[timeind], lw=1, color='k', clip_on=False)
+    
+    ax2.vlines(vline0, cell.somav.min(), cell.somav.max(), 'k', 'dashed', lw=0.25)
+    ax2.vlines(vline1, cell.somav.min(), cell.somav.max(), 'k', 'dashdot', lw=0.25)
+    ax2.vlines(vline2, cell.somav.min(), cell.somav.max(), 'k', 'dotted', lw=0.25)
+    
+    ax2.set_xticks(xticks)
+    ax2.set_xticklabels(xticks)
+    ax2.axis(ax2.axis('tight'))
+    ax2.set_ylabel(r'$V_\mathrm{soma}(t)$ (mV)')
+    
+    for loc, spine in ax2.spines.items():
+        if loc in ['right', 'top']:
+            spine.set_color('none')            
+    ax2.xaxis.set_ticks_position('bottom')
+    ax2.yaxis.set_ticks_position('left')
+    
+    ax2.set_title('somatic potential', va='center')
+
+    ax2.text(-0.3, 1.0, 'b',
+        horizontalalignment='center',
+        verticalalignment='center',
+        fontsize=16, fontweight='demibold',
+        transform=ax2.transAxes)
+
+    ax3 = fig.add_axes([0.75, 0.1, 0.2, 0.35], frameon=True)
+    ax3.plot(cell.tvec[timeind], LFPtrace[timeind], lw=1, color='k', clip_on=False)
+    ax3.plot(0.5, 0, '*', markersize=5, markeredgecolor='none', markerfacecolor='k')
+
+    ax3.vlines(vline0, LFPtrace.min(), LFPtrace.max(), 'k', 'dashed', lw=0.25)
+    ax3.vlines(vline1, LFPtrace.min(), LFPtrace.max(), 'k', 'dashdot', lw=0.25)
+    ax3.vlines(vline2, LFPtrace.min(), LFPtrace.max(), 'k', 'dotted', lw=0.25)
+
+    ax3.set_xticks(xticks)
+    ax3.set_xticklabels(xticks)
+    ax3.axis(ax3.axis('tight'))
+    
+    for loc, spine in ax3.spines.items():
+        if loc in ['right', 'top']:
+            spine.set_color('none')            
+    ax3.xaxis.set_ticks_position('bottom')
+    ax3.yaxis.set_ticks_position('left')
+
+    ax3.set_xlabel(r'$t$ (ms)', va='center')
+    ax3.set_ylabel(r'$\Phi(\mathbf{r},t)$ (mV)')
+                   
+    ax3.set_title('extracellular spike', va='center')
+
+    ax3.text(-0.3, 1.0, 'c',
+        horizontalalignment='center',
+        verticalalignment='center',
+        fontsize=16, fontweight='demibold',
+        transform=ax3.transAxes)
+
+    return fig
