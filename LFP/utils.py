@@ -349,50 +349,59 @@ def plot_ex2(cell, electrode, X, Y, Z, time_show):
 
 def plot_elec_grid(cell, electrode):
     '''example2.py plotting function'''
-    #creating array of points and corresponding diameters along structure
-    for i in range(cell.xend.size):
-        if i == 0:
-            xcoords = np.array([cell.xmid[i]])
-            ycoords = np.array([cell.ymid[i]])
-            zcoords = np.array([cell.zmid[i]])
-            diams = np.array([cell.diam[i]])    
-        else:
-           # if cell.zmid[i] < 100 and cell.zmid[i] > -100 and \
-                   # cell.xmid[i] < 100 and cell.xmid[i] > -100:
-            xcoords = np.r_[xcoords, np.linspace(cell.xstart[i],
-                                            cell.xend[i], cell.length[i]*3)]   
-            ycoords = np.r_[ycoords, np.linspace(cell.ystart[i],
-                                            cell.yend[i], cell.length[i]*3)]   
-            zcoords = np.r_[zcoords, np.linspace(cell.zstart[i],
-                                            cell.zend[i], cell.length[i]*3)]   
-            diams = np.r_[diams, np.linspace(cell.diam[i], cell.diam[i],
-                                            cell.length[i]*3)]
-    
-    #sort along depth-axis
-    argsort = np.argsort(ycoords)
-    
-    #plotting
     fig = plt.figure(figsize=[15, 10])
     ax = fig.add_axes([0.1, 0.1, 0.533334, 0.8], frameon=False)
-    ax.scatter(xcoords[argsort], zcoords[argsort], s=diams[argsort]**2*20,
-               c=ycoords[argsort], edgecolors='none', cmap='gray')
+    # Plot geometry of the cell
+    for sec in LFPy.cell.neuron.h.allsec():
+        idx = cell.get_idx(sec.name())
+        if sec.name()=="soma[0]":
+            ax.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
+                np.r_[cell.zstart[idx], cell.zend[idx][-1]],
+                'k',linewidth=8)
+        else:
+            ax.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
+                np.r_[cell.zstart[idx], cell.zend[idx][-1]],
+                'k',linewidth=2)
+
+
+    # Plot synapses as red dots
+
+    ax.plot([cell.synapses[0].x], [cell.synapses[0].z], color=[1,0,0], marker='o', markersize=5)
+    #creating array of points and corresponding diameters along structure
+    #for i in range(cell.xend.size):
+    #    if i == 0:
+    #        xcoords = np.array([cell.xmid[i]])
+    #       ycoords = np.array([cell.ymid[i]])
+    #        zcoords = np.array([cell.zmid[i]])
+    #        diams = np.array([cell.diam[i]])    
+    #    else:
+    #       # if cell.zmid[i] < 100 and cell.zmid[i] > -100 and \
+    #               # cell.xmid[i] < 100 and cell.xmid[i] > -100:
+    #        xcoords = np.r_[xcoords, np.linspace(cell.xstart[i],
+    #                                        cell.xend[i], cell.length[i]*3)]   
+    #        ycoords = np.r_[ycoords, np.linspace(cell.ystart[i],
+    #                                        cell.yend[i], cell.length[i]*3)]   
+    #        zcoords = np.r_[zcoords, np.linspace(cell.zstart[i],
+    #                                        cell.zend[i], cell.length[i]*3)]   
+    #        diams = np.r_[diams, np.linspace(cell.diam[i], cell.diam[i],
+    #                                        cell.length[i]*3)]
+    
+    #sort along depth-axis
+    #argsort = np.argsort(ycoords)
+    #plotting
+    
+    #ax.scatter(xcoords[argsort], zcoords[argsort], s=diams[argsort]**2*20,
+     #          c=ycoords[argsort], edgecolors='none', cmap='gray')
     ax.plot(electrode.x, electrode.z, '.', marker='o', markersize=5, color='k')
     
     i = 0
     limLFP = abs(electrode.LFP).max()
     for LFP in electrode.LFP:
         tvec = cell.tvec*0.6 + electrode.x[i] + 2
-        if abs(LFP).max() >= 1.5e-4:
-            factor = 250000
-            color='r'
-        elif abs(LFP).max() < 12.1e-6:
-            factor = 1000000
-            color = 'b'
-        else:
-            factor = 500000
-            color = 'g'
-        trace = LFP*factor + electrode.z[i]
-        ax.plot(tvec, trace, color=color, lw = 2)
+    
+        trace = LFP*500000 + electrode.z[i]
+
+        ax.plot(tvec, trace, color='b', lw = 2)
         i += 1
     
     #ax.plot([22, 28], [-60, -60], color='k', lw = 3)
@@ -415,8 +424,20 @@ def plot_elec_grid(cell, electrode):
     #ax.set_xticks([])
     #ax.set_yticks([])
     
-    ax.axis([-425, -25, -350, 350])
-    
+    ax.axis([-520, 50, -450, 650])
+
+    # scale bar - horizontal
+    ax.plot([-425,-375],[300,300],'k')
+    ax.text(-420,275,'50 um')
+
+    # scale bar - vertical
+    ax.plot([-425,-425],[300,350],'k')
+    ax.text(-475,325,'50 um')
+
+    # scale bar - voltage vertical
+    ax.plot([-100,-100],[300,350],'b')
+    ax.text(-95,325,'0.1 $\mu$V')
+
     ax.set_title('Location-dependent extracellular spike shapes')
 
     #plotting the soma trace    

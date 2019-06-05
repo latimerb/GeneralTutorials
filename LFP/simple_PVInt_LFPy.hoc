@@ -1,0 +1,83 @@
+/* ----------------------------------------------------
+example_morphology.hoc
+
+This hoc file creates a neuron of the following shape:
+
+
+                |
+                |
+                |
+                O
+                
+Note the conventions:
+ - soma needs to be a list (soma[0], not soma),
+ - use soma for the soma compartment,
+ - use a name starting with dend for the dendrites.
+-----------------------------------------------------*/
+
+
+create soma[1]
+create dend[1]
+
+soma[0] {
+    pt3dadd(0, 0, 0, 15)
+    pt3dadd(0, 0, 15, 15)
+    nseg = 1
+}
+
+dend[0] {
+    pt3dadd(0, 0, 15, 10)
+    pt3dadd(0, 0, 165, 10)
+    nseg = 7
+}
+
+
+connect dend[0](0), soma[0](1)
+
+Cm = 1
+RaAll= 150
+RaSoma= 150*22.5
+RaDend = 150
+			
+nash=10
+Vrest = -70
+celsius = 31.0 
+
+
+dend[0]{
+	cm = Cm
+	Ra = RaDend	
+	Rm = 20000
+
+	insert leakinter
+	glbar_inter_leakinter = 1/Rm // (siemens/cm2)
+	el_leakinter = -70	// (mV)
+
+	insert nainter
+	ena = 45		// (mV)
+	gnabar_nainter = 0.010	// (siemens/cm2)
+
+	insert kdrinter
+	ek = -80		// (mV)
+	gkdrbar_kdrinter = 0.003 // (siemens/cm2)
+}
+
+soma[0]{
+	Ra = RaSoma	
+	cm = Cm
+	Rm = 20000
+	
+	insert leakinter
+	glbar_inter_leakinter = 1/Rm // (siemens/cm2)
+	el_leakinter = -70	// (mV)
+
+	insert nainter
+	ena = 45		// (mV)
+	gnabar_nainter = 0.035	// (siemens/cm2)
+
+	insert kdrinter
+	ek = -80		// (mV)
+	gkdrbar_kdrinter = 0.008 // (siemens/cm2)
+}
+
+
