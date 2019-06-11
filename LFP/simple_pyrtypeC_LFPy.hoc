@@ -78,13 +78,13 @@ nash=10
 Vrest = -70
 celsius = 31.0 
 
-gna12_ais_max = 0//3000   // Nav1.2 
-gna16_ais_max = 0//3200   // Nav1.6
-gkv_axon = 0//1000
+gna12_ais_max = 3000   // Nav1.2 
+gna16_ais_max = 3200   // Nav1.6
+gkv_axon = 1000
 
 dend[0]{
 	insert pas e_pas = -72  g_pas = gleak_dend Ra=RaDend cm = Cm
-/*
+
 	insert cadyn 
     gcabar_cadyn = 0//gca 
     eca = 120
@@ -107,12 +107,12 @@ dend[0]{
     gbar_im(1/(2*nseg)) = 0//0.8*gm
 	insert kap 
     gkabar_kap = 0	
-*/
+
 }
 
 dend[1]{
 	insert pas e_pas = -72  g_pas = gleak_dend  Ra=RaAll cm = Cm
-/*
+
 	insert cadyn 
     gcabar_cadyn = 0//gca  
     eca = 120	
@@ -133,12 +133,12 @@ dend[1]{
     gbar_im(1/(2*nseg)) = 0//1.0*gm
 	insert kap 
     gkabar_kap = 0//gkap
-*/
+
 }
 
 soma[0]{	
 	insert pas e_pas= -72  g_pas = gleak   Ra=RaSoma cm = Cm
-/*
+
 	insert cadyn gcabar_cadyn = gca  eca = 120	
 	insert hd ghdbar_hd = ghd 
 	insert na3 sh_na3=nash ar_na3=1	gbar_na3 = 3*gna
@@ -148,7 +148,7 @@ soma[0]{
 	insert sAHP gsAHPbar_sAHP = gsAHP
 	insert im gbar_im = gm
 	insert kap gkabar_kap = gkap
-*/	
+
 }
 
 for i=0,9 axon[i] {

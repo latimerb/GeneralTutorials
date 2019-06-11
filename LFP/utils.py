@@ -199,7 +199,7 @@ def Plot_active_currs_volt(cell,electrode,synapse):
             plt.xlabel('time(ms)')
             plt.ylim(-0.001,0.001)  
 
-def plot_ex1(cell, electrode, X, Y, Z, time_show):
+def plot_ex1(cell, electrode, X, Y, Z, time_show, space_lim):
     '''
     plot the morphology and LFP contours, synaptic current and soma trace
     '''
@@ -252,13 +252,16 @@ def plot_ex1(cell, electrode, X, Y, Z, time_show):
         ax1.set_xticklabels([])
         ax1.set_yticks([])
         ax1.set_yticklabels([])
-        ax1.set_xlim(-900,400)
+        x1 = space_lim[0]; x2 = space_lim[1]
+        y1 = space_lim[2]; y2 = space_lim[3]
+        ax1.set_xlim(x1,x2)
+        ax1.set_ylim(y1,y2)
         #ax1.set_ylim(-500,100)
         if i==0:
-            ax1.plot([-600, -600], [-550, -350], color='k', lw=2)
-            ax1.text(-800, -475, '200 um')
-            ax1.plot([-600, -400], [-550, -550], color='k', lw=2)
-            ax1.text(-580, -610, '200 um')
+            ax1.plot([x1+70, x1+70], [y2-200, y2-100], color='k', lw=2)
+            #ax1.text(x1+1, y2-150, '100 um')
+            ax1.plot([x1+70, x1+170], [y2-200,y2-200], color='k', lw=2)
+            #ax1.text(x1+80, y2-230, '100 um')
 
     #fig2 = plt.figure(figsize=(15, 6))
     # Plot synaptic input current
@@ -405,7 +408,7 @@ def plot_elec_grid(cell, electrode):
     i = 0
     limLFP = abs(electrode.LFP).max()
     for LFP in electrode.LFP:
-        tvec = cell.tvec*0.9 + electrode.x[i] + 2
+        tvec = cell.tvec*0.2 + electrode.x[i] + 2
         #print(np.max(LFP))    
         #if np.max(LFP)>0.018:
         #    factor = 1000
