@@ -1,4 +1,4 @@
-//begintemplate detailedpyrtypeA
+begintemplate Henckens_Pyr
 
 /*
 public init, connect_sections, size_sections, append_sections, define_synapses
@@ -103,9 +103,7 @@ proc connect_sections() { local i
 	for i = 1, 10 connect axon[i](0), axon[i-1](1)
 }
 
-
-proc size_sections() {
-  proc shape3d_1() {
+proc shape3d_1() {
   soma[0] {pt3dclear()
 	pt3dadd(-12.306, 0, 0, 24.612)
 	pt3dadd(0, 0, 0, 24.612)
@@ -581,6 +579,7 @@ proc shape3d_2() {
 	pt3dadd(29.4, -63.25, -7.3, 1.21)
   }
 }
+
 proc shape3d_3() {
   dend[34] {pt3dclear()
 	pt3dadd(29.4, -63.25, -7.3, 1.21)
@@ -1046,7 +1045,7 @@ proc shape3d_4() {
 	pt3dadd(7.39, 214.33, 1.28, 1.21)
   }
 }
-    proc shape3d_5() {
+proc shape3d_5() {
   apic[18] {	pt3dadd(10.45, 222.2, 3.03, 1.09)
 	pt3dadd(10.89, 225.26, 5.89, 1.09)
 	pt3dadd(11.02, 229.78, 7.62, 1.09)
@@ -1279,7 +1278,7 @@ proc shape3d_4() {
 	pt3dadd(34.82, 108.48, -55.07, 1.21)
   }
     }
-    proc shape3d_6() {
+proc shape3d_6() {
   apic[33] {	pt3dadd(36.72, 110.45, -54.04, 1.21)
 	pt3dadd(39.08, 112.71, -52.99, 1.21)
 	pt3dadd(42.46, 115.59, -49.89, 1.21)
@@ -1344,33 +1343,37 @@ proc shape3d_4() {
 	pt3dadd(-19.81, -26.58, 15.55, 1.33)
 	pt3dadd(-22.69, -27.32, 14.36, 1.33)
   }
-    }
-    proc basic_shape() {
-        shape3d_1()
-        shape3d_2()
-        shape3d_3()
-        shape3d_4()
-        shape3d_5()
-        shape3d_6()
-    }
+}
+	
+proc basic_shape() {
+    shape3d_1()
+    shape3d_2()
+    shape3d_3()
+    shape3d_4()
+    shape3d_5()
+    shape3d_6()
+}
+
+proc size_sections() {
+  
     basic_shape()
 
-  for i=0,9{
-	axon[i] {pt3dclear()
-		pt3dadd(-5*i-7.40274, 0, 0, 0.5) 
-		pt3dadd(-2.5*(i+1)-7.40274, 0, 0, 0.5) 
-		pt3dadd(-5*(i+1)-7.40274, 0, 0, 0.5)
+	for i=0,9{
+		axon[i] {pt3dclear()
+			pt3dadd(-5*i, 0, 0, 0.5) 
+			pt3dadd(-2.5*(i+1), 0, 0, 0.5) 
+			pt3dadd(-5*(i+1), 0, 0, 0.5)
+		}
 	}
-  }
-  axon[10]{pt3dclear()
-	pt3dadd(-57.40274, 0, 0, 0.5) 
-	pt3dadd(-107.40274, 0, 0, 0.5) 
-	pt3dadd(-157.40274, 0, 0, 0.5)
-  }
+	axon[10]{pt3dclear()
+		pt3dadd(-50, 0, 0, 0.5) 
+		pt3dadd(-100, 0, 0, 0.5) 
+		pt3dadd(-150, 0, 0, 0.5)
+	}
 }
 
 
-objref all, dendrite_list, soma_list, axon_list
+objref all, dendrite_list, apical_list, soma_list, axon_list
 proc append_sections() { local i
 	objref all, dendrite_list, apical_list, soma_list, axon_list
 
@@ -1679,6 +1682,5 @@ proc define_synapses() {
 		findme = 1
 	}
 }
-
-endtemplate detailedpyrtypeA
 */
+endtemplate Henckens_Pyr
