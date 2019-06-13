@@ -407,16 +407,20 @@ def plot_elec_grid(cell, electrode):
     
     i = 0
     limLFP = abs(electrode.LFP).max()
+    #print("absolute max:",limLFP)
     for LFP in electrode.LFP:
-        tvec = cell.tvec*0.2 + electrode.x[i] + 2
-        #print(np.max(LFP))    
-        #if np.max(LFP)>0.018:
-        #    factor = 1000
-        #    color = 'r'
-        #else:
-        factor = 500000
-        color = 'b'
- 
+        tvec = cell.tvec*0.6 + electrode.x[i] + 2
+        #print("current max:",np.max(np.abs(LFP)))
+        if np.max(np.abs(LFP))>0.25*limLFP:
+            factor = 400
+            color = 'r'
+        elif np.max(np.abs(LFP))>0.04*limLFP:
+            factor = 3000
+            color = 'b'
+        else:
+            factor = 10000
+            color = 'g'
+
         trace = LFP*factor + electrode.z[i]
 
         ax.plot(tvec,trace, color=color, lw = 2)
