@@ -622,3 +622,114 @@ def plot_vmem_heat(cell,time_show):
             i+=1
     #cell.vmem[i,800]
     return fig
+
+def plot_elec_grid_stick(cell, electrode):
+    '''example2.py plotting function'''
+    fig = plt.figure(figsize=[15, 15])
+    ax = fig.add_axes([0.1, 0.1, 0.533334, 0.8], frameon=False)
+    # Plot geometry of the cell
+    for sec in LFPy.cell.neuron.h.allsec():
+        idx = cell.get_idx(sec.name())
+        if sec.name()=="soma[0]":
+            ax.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
+                np.r_[cell.zstart[idx], cell.zend[idx][-1]],
+                color=[0.7,0.7,0.7],linewidth=8)
+        else:
+            ax.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
+                np.r_[cell.zstart[idx], cell.zend[idx][-1]],
+                color=[0.7,0.7,0.7],linewidth=2)
+
+
+    # Plot synapses as red dots
+
+    ax.plot([cell.synapses[0].x], [cell.synapses[0].z], color=[1,0,0], marker='o', markersize=5)
+    #creating array of points and corresponding diameters along structure
+    #for i in range(cell.xend.size):
+    #    if i == 0:
+    #        xcoords = np.array([cell.xmid[i]])
+    #       ycoords = np.array([cell.ymid[i]])
+    #        zcoords = np.array([cell.zmid[i]])
+    #        diams = np.array([cell.diam[i]])    
+    #    else:
+    #       # if cell.zmid[i] < 100 and cell.zmid[i] > -100 and \
+    #               # cell.xmid[i] < 100 and cell.xmid[i] > -100:
+    #        xcoords = np.r_[xcoords, np.linspace(cell.xstart[i],
+    #                                        cell.xend[i], cell.length[i]*3)]   
+    #        ycoords = np.r_[ycoords, np.linspace(cell.ystart[i],
+    #                                        cell.yend[i], cell.length[i]*3)]   
+    #        zcoords = np.r_[zcoords, np.linspace(cell.zstart[i],
+    #                                        cell.zend[i], cell.length[i]*3)]   
+    #        diams = np.r_[diams, np.linspace(cell.diam[i], cell.diam[i],
+    #                                        cell.length[i]*3)]
+    
+    #sort along depth-axis
+    #argsort = np.argsort(ycoords)
+    #plotting
+    
+    #ax.scatter(xcoords[argsort], zcoords[argsort], s=diams[argsort]**2*20,
+     #          c=ycoords[argsort], edgecolors='none', cmap='gray')
+    ax.plot(electrode.x, electrode.z, '.', marker='o', markersize=5, color='k')
+    
+    i = 0
+    limLFP = abs(electrode.LFP).max()
+    #print("absolute max:",limLFP)
+    for LFP in electrode.LFP:
+        tvec = cell.tvec[cell.tvec>450]*0.7 + electrode.x[i] + -312
+        #print("current max:",np.max(np.abs(LFP)))
+        if np.max(np.abs(LFP))>0.25*limLFP:
+            factor = 160000
+            color = 'r'
+        elif np.max(np.abs(LFP))>0.04*limLFP:
+            factor = 1200000
+            color = 'b'
+        else:
+            factor = 5000000
+            color = 'g'
+
+        trace = (LFP[cell.tvec>450]-np.mean(LFP[cell.tvec<450]))*factor + electrode.z[i]
+
+        ax.plot(tvec,trace, color=color, lw = 2)
+        i += 1
+    
+    #ax.plot([22, 28], [-60, -60], color='k', lw = 3)
+    #ax.text(22, -65, '10 ms')
+    
+    #ax.plot([40, 50], [-60, -60], color='k', lw = 3)
+    #ax.text(42, -65, '10 $\mu$m')
+    
+    #ax.plot([60, 60], [20, 30], color='r', lw=2)
+    #ax.text(62, 20, '5 mV')
+    
+    #ax.plot([60, 60], [0, 10], color='g', lw=2)
+    #ax.text(62, 0, '1 mV')
+    
+    #ax.plot([60, 60], [-20, -10], color='b', lw=2)
+    #ax.text(62, -20, '0.1 mV')
+    
+    
+    #ax.axis([-500, 150, -350, 650])
+
+    # scale bar - horizontal
+    #ax.plot([-425,-375],[300,300],'k')
+    #ax.text(-420,275,'50 um')
+
+    # scale bar - vertical
+    #ax.plot([-425,-425],[300,350],'k')
+    #ax.text(-475,325,'50 um')
+
+    # scale bar - voltage vertical
+    #ax.plot([-100,-100],[300,350],'b')
+    #ax.text(-135,320,'20 $\mu$V')
+
+    # scale bar - voltage horizontal
+    #ax.plot([-100,-50],[300,300],'b')
+    #ax.text(-95,280,'5 ms')
+
+    ax.set_title('Location-dependent extracellular spike shapes')
+
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+
+    return fig

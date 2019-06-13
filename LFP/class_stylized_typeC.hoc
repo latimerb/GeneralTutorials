@@ -15,9 +15,9 @@ Note the conventions:
  - use a name starting with dend for the dendrites.
 -----------------------------------------------------*/
 
-begintemplate simple_pyrtypeC_LFPy
+//begintemplate stylized_typeC
 
-	public soma, dend, axon
+	//public soma[1], dend[2], axon[11]
 
 	create soma[1]
 	create dend[2]
@@ -52,7 +52,7 @@ begintemplate simple_pyrtypeC_LFPy
 
 		axon[10]{pt3dclear()
 			pt3dadd(-50,0,0,1.0)
-			pt3dadd(-450,0,0,1.0)
+			pt3dadd(-150,0,0,1.0)
 		}
 
 		connect dend[0](0), soma[0](1)
@@ -88,7 +88,8 @@ begintemplate simple_pyrtypeC_LFPy
 		gkv_axon = 1000
 
 		dend[0]{
-			insert leak el_leak = -72  glbar_leak = gleak_dend Ra=RaDend cm = Cm
+			insert pas e_pas = -72  g_pas = gleak_dend Ra=RaDend cm = Cm
+
 			insert cadyn gcabar_cadyn = gca eca = 120
 			insert hd ghdbar_hd = ghd 
 			insert na3 sh_na3=nash ar_na3=1	gbar_na3 = gna
@@ -102,7 +103,7 @@ begintemplate simple_pyrtypeC_LFPy
 		}
 
 		dend[1]{
-			insert leak el_leak= -72  glbar_leak = gleak_dend  Ra=RaAll cm = Cm
+			insert pas e_pas = -72  g_pas = gleak_dend Ra=RaDend cm = Cm
 			insert cadyn gcabar_cadyn = gca  eca = 120	
 			insert hd ghdbar_hd = ghd
 			insert na3 sh_na3=nash ar_na3=1	gbar_na3 = gna
@@ -115,7 +116,7 @@ begintemplate simple_pyrtypeC_LFPy
 		}
 
 		soma[0]{	
-			insert leak el_leak= -72  glbar_leak = gleak   Ra=RaSoma cm = Cm
+			insert pas e_pas = -72  g_pas = gleak Ra=RaDend cm = Cm
 			insert cadyn gcabar_cadyn = gca  eca = 120	
 			insert hd ghdbar_hd = ghd 
 			insert na3 sh_na3=nash ar_na3=1	gbar_na3 = 3*gna
@@ -190,5 +191,5 @@ begintemplate simple_pyrtypeC_LFPy
 		axon[9].gbar_kv = gkv_axon	*	1
 		axon[10].gbar_kv = gkv_axon	*	1
 	}
-
-endtemplate simple_pyrtypeC_LFPy
+init()
+//endtemplate stylized_typeC
