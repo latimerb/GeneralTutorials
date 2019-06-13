@@ -1,6 +1,6 @@
-//begintemplate Henckens_Pyr
+begintemplate Henckens_PyrAMC1A
 
-/*
+
 public init, connect_sections, size_sections, append_sections, define_synapses
 public mechinit, insert_mechs, set_biophys, get_root
 public  pre_list, connect_pre, is_art, is_connected, gid, randi
@@ -8,7 +8,7 @@ public soma, dend, axon
 public all, soma_list, axon_list, dendrite_list
 public x, y, z, position, myroot, myrootsec, Vrest
 public NumSoma, NumDend, NumAxon
-*/
+
 
 // strings
 strdef myroot, myname
@@ -20,7 +20,7 @@ objref syn, pre_list, templist, rootlist, myrootsec, this
 //external numCellTypes, cellType
 
 // create the sections
-create soma[1], dend[35], apic[22]//, axon[11]
+create soma[1], dend[35], apic[22], axon[11]
 
 proc init() {
 	//gid = $1
@@ -30,7 +30,7 @@ proc init() {
 	connect_sections()	// local fcn: connect soma, dendrites, axon initial segment
 	size_sections()		// local fcn: set the size dimensions of each section
 	define_shape()		// builtin fcn: fill in 3d info for sections defined by only L and diam, translate 3d points for consistency with their connections 
-  	//append_sections()	// local fcn: append all sections to the section list
+  	append_sections()	// local fcn: append all sections to the section list
 	//set_nseg()			// local fcn: set the number of segments in each section
 	//get_root()			// local fcn: perform morphology checks
 
@@ -80,8 +80,8 @@ proc connect_sections() { local i
   for i = 16, 17 connect apic[i](0), apic[15](1)
   for i = 18, 19 connect apic[i](0), apic[17](1)
   for i = 20, 21 connect apic[i](0), apic[19](1)
-	//connect axon(0), soma[0](0.5)
-	//for i = 1, 10 connect axon[i](0), axon[i-1](1)
+  connect axon[0](0), soma[0](0.5)
+  for i = 1, 10 connect axon[i](0), axon[i-1](1)
     basic_shape()
 }
 
@@ -1093,7 +1093,7 @@ proc basic_shape() {
 proc size_sections() {
   
     basic_shape()
-/*
+
 	for i=0,9{
 		axon[i] {pt3dclear()
 			pt3dadd(-5*i, 0, 0, 1.0) 
@@ -1106,10 +1106,10 @@ proc size_sections() {
 		pt3dadd(-100, 0, 0, 1.0) 
 		pt3dadd(-150, 0, 0, 1.0)
 	}
-*/
+
 
 }
-/*
+
 
 objref all, dendrite_list, apical_list, soma_list, axon_list
 proc append_sections() { local i
@@ -1146,7 +1146,7 @@ external lambda_f
 proc set_nseg() {
   	forsec all { nseg = int((L/(0.1*lambda_f(100))+.9)/2)*2 + 1  }
 }
-*/
+
 
 proc mechinit() {
 
@@ -1198,9 +1198,9 @@ proc mechinit() {
 	nash=10
 
 	// axon channels
-	gna12_ais_max = 0//3000   // Nav1.2 
-	gna16_ais_max = 0//3200   // Nav1.6
-	gkv_axon = 0//1000
+	gna12_ais_max = 3000   // Nav1.2 
+	gna16_ais_max = 3200   // Nav1.6
+	gkv_axon = 1000
 	nash=10
 	
 	tha_na16 = -43
@@ -1265,7 +1265,7 @@ proc insert_mechs() {
 			
 		}	
 	}	
-/*
+
 	for i=0,9 axon[i] {
 		insert pas
 		Ra = RaAx//50000
@@ -1326,7 +1326,7 @@ proc insert_mechs() {
 	axon[8]. gbar_kv = gkv_axon	*	1
 	axon[9]. gbar_kv = gkv_axon	*	1
 	axon[10]. gbar_kv = gkv_axon	*	1
-	*/
+	
 }
 
 init()
@@ -1427,4 +1427,4 @@ proc define_synapses() {
 	}
 }
 */
-//endtemplate Henckens_Pyr
+endtemplate Henckens_PyrAMC1A
