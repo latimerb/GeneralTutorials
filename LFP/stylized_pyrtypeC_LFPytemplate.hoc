@@ -14,7 +14,7 @@ begintemplate stylized_pyrtypeC
 	    apical = new SectionList()
 	    axonal = new SectionList()
         //forall delete_section()        
-
+        print "section lists created"
         geometry()
         print "printing section names"
         forall print secname()

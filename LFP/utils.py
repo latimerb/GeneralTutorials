@@ -725,7 +725,10 @@ def plot_elec_grid_stick(cell, electrode):
         if int(np.floor((colors.shape[0]-1)*factor/max_factor))<=0:
             color = colors[0,:]
         else:
-            color = colors[int(np.floor((colors.shape[0]-1)*factor/max_factor)),:]
+            if int(np.floor((colors.shape[0]-1)*factor/max_factor))>=colors.shape[0]:
+                color = colors[-1,:]
+            else:
+                color = colors[int(np.floor((colors.shape[0]-1)*factor/max_factor)),:]
 
         #print("electrode {} color: {}".format(i,color/255))
         
