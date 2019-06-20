@@ -1,0 +1,223 @@
+begintemplate stylized_pyrtypeC
+    public init
+    public locateSites, getLongestBranch
+    public all, somatic, apical, axonal, basal
+    objref SecSyn, this
+    strdef tstr
+    objref all, somatic, apical, axonal, basal
+    
+    create soma[1],apic[1],dend[1],axon[11],hill[1]
+    proc init(){localobj nl,import
+        all = new SectionList()
+	    somatic = new SectionList()
+	    basal = new SectionList()
+	    apical = new SectionList()
+	    axonal = new SectionList()
+        //forall delete_section()        
+
+        geometry()
+        print "printing section names"
+        forall print secname()
+
+        print "appending to section lists"
+        forall ifsec "soma" somatic.append()
+        forall ifsec "dend" basal.append()   
+        forall ifsec "apic" apical.append()
+        forall ifsec "axon" axonal.append()
+        forall ifsec "hill" axonal.append()
+        forall all.append()
+        
+        biophys()
+        print "biophysics done"
+        
+    }
+
+    proc biophys() {
+        Vrest = -70.
+        Cm = 0.5
+        RaAll= 150
+        Rm = 30000
+        Ena = 60
+        gna12_soma = 0//80
+        gna12_dend = 0//80 
+        gna12_ais_max = 0//3200   // Nav1.2 
+        gna16_ais_max = 3200   // Nav1.6
+        gna16_nakeaxon= 300    
+        gna12_myelin=20       // Nav1.2 at myelins
+        gna16_node = 3200     // Nav1.6 at node
+	          
+        vhalf_na12 = -30
+        vhalf_na16 = -43
+        vhalf_na = -30
+	          
+        // Kv
+        Ek = -90  
+        gkv_soma = 20
+        gkv_dend = 10 
+        gkv_axon = 1000
+	          
+        // Km
+        gkm = .3
+        gkm_soma = gkm
+	          
+        // Kca
+        gkca = 3
+        gkca_soma = gkca
+	          
+        // Ca
+        Eca=140
+        gca = .3
+        gca_soma = gca
+
+        
+	    forall {
+	        insert pas
+		    cm = Cm
+		    Ra = RaAll
+		    e_pas = Vrest
+            g_pas = 1.0/Rm
+	    }
+
+        forall {
+	        insert na gbar_na=0
+	        insert na12  gbar_na12=0
+	        insert na16  gbar_na16=0
+	        insert kv    gbar_kv=0
+	        insert km    gbar_km=0
+	        insert kca   gbar_kca=0
+	        insert ca    gbar_ca=0
+        }
+
+        // Added by Hu et al. 2009
+        vshift_na12 = -35 - vhalf_na12 -10  // negative shift of input voltage, high threshold  -30mV    
+        vshift_na16 = -35 - vhalf_na16 -10    // positive shift of input voltage, low threshold  -43mV
+        vshift_na = -35 - vhalf_na -10  // the same as Na12
+		    
+        forall if(ismembrane("k_ion")) ek = Ek
+        forall if(ismembrane("na_ion")) ena = Ena
+        forall if(ismembrane("ca_ion")) {
+	        eca = Eca
+	        ion_style("ca_ion",0,1,0,0,0)
+	        vshift_ca = 0
+        }
+
+        forsec somatic {
+            print "Active conductances in soma!"
+	        gbar_na=gna12_soma          // 80
+	        gbar_kv = gkv_soma            // 20 
+	        gbar_km = gkm_soma            // 0.3
+	        gbar_kca = gkca_soma          // 0.3
+	        gbar_ca = gca_soma            // 0.3
+        }
+
+	    forsec apical {
+		    gbar_na = gna12_dend    // 80
+	        gbar_kv = gkv_dend        // 20                            
+	        gbar_km  = gkm            // 0.3                           
+	        gbar_kca = gkca           // 0.3                           
+	        gbar_ca = gca             // 0.3                           
+	        insert cad                // Internal calcium concentration mechanism only at somatodendritic region.
+	    }
+	    
+	    
+        forsec basal {
+		    gbar_na = gna12_dend    // 80
+	        gbar_kv = gkv_dend        // 20                            
+	        gbar_km  = gkm            // 0.3                           
+	        gbar_kca = gkca           // 0.3                           
+	        gbar_ca = gca             // 0.3                           
+	        insert cad                // Internal calcium concentration mechanism only at somatodendritic region.
+	    }
+
+        hill[0].gbar_na12 = gna12_ais_max*	1	*	0.8
+        axon[0].gbar_na12 = gna12_ais_max*0.96*1
+        axon[1].gbar_na12 = gna12_ais_max*0.9*1                      
+        axon[2].gbar_na12 = gna12_ais_max*0.75*1                    
+        axon[3].gbar_na12 = gna12_ais_max*0.55*0.95              
+        axon[4].gbar_na12 = gna12_ais_max*0.366985879*0.880142857  
+        axon[5].gbar_na12 = gna12_ais_max*0.2*0.75                 
+        axon[6].gbar_na12 = gna12_ais_max*0.100330761*0.647857143  
+        axon[7].gbar_na12 = gna12_ais_max*0.011532125*0.520285714 
+        axon[8].gbar_na12 = gna12_ais_max*0*0.428571429            
+        axon[9].gbar_na12 = gna12_ais_max*0*0.342857143 
+        axon[10].gbar_na12 = gna12_ais_max*0*0.342857143 
+			    
+        hill[0].gbar_na16 = gna16_ais_max	    *	0	*	0.8
+        axon[0].gbar_na16 = gna16_ais_max	*	0.04	*	1   
+        axon[1].gbar_na16 = gna16_ais_max	*	0.1	*	1   
+        axon[2].gbar_na16 = gna16_ais_max	*	0.25	*	1   
+        axon[3].gbar_na16 = gna16_ais_max	*	0.45	*	0.95   
+        axon[4].gbar_na16 = gna16_ais_max	*	0.633014121	*	0.880142857   
+        axon[5].gbar_na16 = gna16_ais_max	*	0.8	*	0.75   
+        axon[6].gbar_na16 = gna16_ais_max	*	0.899669239	*	0.647857143   
+        axon[7].gbar_na16 = gna16_ais_max	*	0.988467875	*	0.520285714   
+        axon[8].gbar_na16 = gna16_ais_max	*	1	*	0.428571429   
+        axon[9].gbar_na16 = gna16_ais_max	*	1	*	0.342857143  
+        axon[10].gbar_na16 = gna16_ais_max	*	1	*	0.342857143  
+					        
+        hill[0].gbar_kv = gkv_axon	*	0.1
+        axon[0].gbar_kv = gkv_axon	*	0.2 
+        axon[1].gbar_kv = gkv_axon	*	0.3 
+        axon[2].gbar_kv = gkv_axon	*	0.4 
+        axon[3].gbar_kv = gkv_axon	*	0.5 
+        axon[4].gbar_kv = gkv_axon	*	0.6 
+        axon[5].gbar_kv = gkv_axon	*	0.7 
+        axon[6].gbar_kv = gkv_axon	*	0.8 
+        axon[7].gbar_kv = gkv_axon	*	0.9
+        axon[8].gbar_kv = gkv_axon	*	1
+        axon[9].gbar_kv = gkv_axon	*	1
+        axon[10].gbar_kv = gkv_axon	*	1
+    }
+
+
+    proc geometry(){
+       
+        soma[0] {pt3dclear()
+	        pt3dadd(0, 0, 0, 25.413)
+	        pt3dadd(0, 0, 25.413, 25.413)
+	        nseg = 1
+        }
+
+        apic[0] {pt3dclear()
+	        pt3dadd(0, 0, 25.413, 4.324)
+	        pt3dadd(0, 0, 25.413+450, 4.324)
+	        nseg = 7
+        }
+
+        dend[0] {pt3dclear()
+	        pt3dadd(0, 0, 0, 14.67)
+	        pt3dadd(0, 0, -150, 14.67)
+	        nseg = 8    
+        }
+
+        hill[0]{pt3dclear()
+	        pt3dadd(-12.707,0,0,6)
+	        pt3dadd(-12.707-2,0,0,5)
+	        pt3dadd(-12.707-4,0,0,4)
+	        pt3dadd(-12.707-6,0,0,3)
+	        pt3dadd(-12.707-8,0,0,2)
+	        pt3dadd(-12.707-10,0,0,1.3)
+	        nseg = 10
+        }
+
+        for i=1,10{
+			axon[i-1] {pt3dclear()
+				pt3dadd(-12.707-5*(i-1)-10, 0, 0, 1.22)
+				pt3dadd(-12.707-5*(i-1)-15, 0, 0, 1.22)
+			}
+		}
+
+		axon[10]{pt3dclear()
+			pt3dadd(-12.707-60,0,0,1.22)
+			pt3dadd(-12.707-160,0,0,1.22)
+		}
+
+		// CONNECT SECTIONS //
+		connect apic[0](0), soma[0](1)
+		connect dend[0](0), soma[0](0)
+		connect hill[0](0), soma[0](0.5)
+		connect axon[0](0), hill[0](1)
+		for i=1,10{connect axon[i](0), axon[i-1](1)}
+    }
+
+endtemplate stylized_pyrtypeC

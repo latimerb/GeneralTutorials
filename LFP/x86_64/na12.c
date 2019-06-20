@@ -144,7 +144,7 @@ extern Memb_func* memb_func;
 #define usetable usetable_na12
  double usetable = 1;
 #define vshift vshift_na12
- double vshift = -5;
+ double vshift = -75;
 #define vmax vmax_na12
  double vmax = 100;
 #define vmin vmin_na12

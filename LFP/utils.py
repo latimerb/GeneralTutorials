@@ -204,7 +204,7 @@ def plot_ex1(cell, electrode, X, Y, Z, time_show, space_lim):
     plot the morphology and LFP contours, synaptic current and soma trace
     '''
     #figure object
-    fig = plt.figure(figsize=(5, 5))
+    fig = plt.figure(figsize=(5*len(time_show), 5))
     fig.subplots_adjust(left=None, bottom=None, right=None, top=None, 
             wspace=0.2, hspace=0.2)
     for i in np.arange(0,len(time_show)):
@@ -223,8 +223,9 @@ def plot_ex1(cell, electrode, X, Y, Z, time_show, space_lim):
         
         #plot_morphology(plot_synapses=True)
         for sec in LFPy.cell.neuron.h.allsec():
+           
             idx = cell.get_idx(sec.name())
-            if sec.name()=="soma[0]":
+            if sec.name()=="stylized_pyrtypeC[0].soma[0]":
                 ax1.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
                     np.r_[cell.zstart[idx], cell.zend[idx][-1]],
                     color=[0.7,0.7,0.7],lw=6)
@@ -365,7 +366,7 @@ def plot_elec_grid(cell, electrode):
     # Plot geometry of the cell
     for sec in LFPy.cell.neuron.h.allsec():
         idx = cell.get_idx(sec.name())
-        if sec.name()=="soma[0]":
+        if sec.name()=="stylized_pyrtypeC[0].soma[0]":
             ax.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
                 np.r_[cell.zstart[idx], cell.zend[idx][-1]],
                 'k',linewidth=8)
@@ -630,7 +631,7 @@ def plot_elec_grid_stick(cell, electrode):
     # Plot geometry of the cell
     for sec in LFPy.cell.neuron.h.allsec():
         idx = cell.get_idx(sec.name())
-        if sec.name()=="soma[0]":
+        if sec.name()=="stylized_pyrtypeC[0].soma[0]":
             ax.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
                 np.r_[cell.zstart[idx], cell.zend[idx][-1]],
                 color=[0.7,0.7,0.7],linewidth=8)
@@ -668,28 +669,74 @@ def plot_elec_grid_stick(cell, electrode):
     
     #ax.scatter(xcoords[argsort], zcoords[argsort], s=diams[argsort]**2*20,
      #          c=ycoords[argsort], edgecolors='none', cmap='gray')
-    ax.plot(electrode.x, electrode.z, '.', marker='o', markersize=5, color='k')
+    #ax.plot(electrode.x, electrode.z, '.', marker='o', markersize=5, color='k')
     
-    i = 0
-    limLFP = abs(electrode.LFP).max()
-    #print("absolute max:",limLFP)
-    for LFP in electrode.LFP:
-        tvec = cell.tvec[cell.tvec>450]*0.7 + electrode.x[i] + -312
-        #print("current max:",np.max(np.abs(LFP)))
-        if np.max(np.abs(LFP))>0.25*limLFP:
-            factor = 160000
-            color = 'r'
-        elif np.max(np.abs(LFP))>0.04*limLFP:
-            factor = 1200000
-            color = 'b'
+    
+    limLFP =  abs(electrode.LFP).max() # 0.010196
+    max_factor = 60 # converts to scale of microns
+    # Define spectrum of colors
+    colors = np.zeros((120,3))
+    for i in np.arange(0,120):
+        if i<20 and i>=0:
+            colors[i,:] = [150 + 5.5*i,0,0] #Dark red to red
+        elif i<40 and i>=20:
+            colors[i,:] = [255,(i-19)*6,0] # Red to orange
+        elif i<60 and i>=40:
+            colors[i,:] = [255,120+(i-39)*6.75,0] # Orange to yellow
+        elif i<80 and i>=60:
+            colors[i,:] = [255-(i-59)*12.5,255,0] # yellow to green
+        elif i<100 and i>=80:
+            colors[i,:] = [0,255,(i-79)*12.5] # green to blue-green
         else:
-            factor = 5000000
-            color = 'g'
+            colors[i,:] = [0,255-(i-99)*12.5,255] # blue-green to blue
+        # Plot colorbar
+        rectangle = plt.Rectangle((6.5*i-343, 720), 10, 100, fc=colors[i,:]/255)
+        plt.gca().add_patch(rectangle)        
+        #ax.plot([i,i,i+10,i+10],[720,720,770,770],color=colors[i,:]/255,lw = 10)
+    #print("colors: ",colors)
+    plt.text(-350,845,"10")
+    plt.text(30,845,"1")
+    plt.text(410,845,"0.1")
+    # time scale bar
+    plt.plot([-280,-320],[100,100],'k')
+    plt.text(-320,80,'5 ms')
+    i = 0
+    smallest = 4.85#4.08 #4.85
+    biggest = 9.67#7.87 # 9.67
+    #for LFP in electrode.LFP:
+        #print("!!!",-np.log(np.max(LFP[cell.tvec>50])-np.min(LFP[cell.tvec>50])))
+    #    if -np.log(np.max(LFP[cell.tvec>50])-np.min(LFP[cell.tvec>50]))<smallest:
+    #        smallest = -np.log(np.max(LFP[cell.tvec>50])-np.min(LFP[cell.tvec>50]))
+    #    if -np.log(np.max(LFP[cell.tvec>50])-np.min(LFP[cell.tvec>50]))>biggest:
+    #        biggest = -np.log(np.max(LFP[cell.tvec>50])-np.min(LFP[cell.tvec>50]))
+    #print("SMALLEST: ",smallest)
+    #print("BIGGEST: ",biggest)
 
-        trace = (LFP[cell.tvec>450]-np.mean(LFP[cell.tvec<450]))*factor + electrode.z[i]
+    for LFP in electrode.LFP:
+        tvec = cell.tvec[cell.tvec>50]*9 + electrode.x[i] + -450
+        
+        #print("amp. of peak:",np.max(np.abs(LFP)))
+        # assign color        
+        x = (-np.log(np.max(LFP[cell.tvec>50])-np.min(LFP[cell.tvec>50])))
+        factor = max_factor*(x-smallest)/(biggest-smallest)
+        #print("FACTOR:",factor)
+        #print("electrode number {}".format(i))
+        #print("colors.shape[0]*factor/max_factor", int(np.floor(colors.shape[0]*factor/max_factor)))
+        if int(np.floor((colors.shape[0]-1)*factor/max_factor))<=0:
+            color = colors[0,:]
+        else:
+            color = colors[int(np.floor((colors.shape[0]-1)*factor/max_factor)),:]
 
-        ax.plot(tvec,trace, color=color, lw = 2)
+        #print("electrode {} color: {}".format(i,color/255))
+        
+        # Take zscore and adjust y axis        
+        zscore = LFP[cell.tvec>50]/(np.max(LFP[cell.tvec>50])-np.min(LFP[cell.tvec>50]))
+        trace = zscore*max_factor + electrode.z[i]
+
+        ax.plot(tvec,trace, color=color/255, lw = 2)
+        #ax.text(tvec[0],trace[0],i)
         i += 1
+    #print("smallest: ",smallest)
     
     #ax.plot([22, 28], [-60, -60], color='k', lw = 3)
     #ax.text(22, -65, '10 ms')
@@ -725,11 +772,12 @@ def plot_elec_grid_stick(cell, electrode):
     #ax.plot([-100,-50],[300,300],'b')
     #ax.text(-95,280,'5 ms')
 
-    ax.set_title('Location-dependent extracellular spike shapes')
+    #ax.set_title('Location-dependent extracellular spike shapes')
 
     ax.set_xticks([])
     ax.set_yticks([])
     ax.set_xticklabels([])
     ax.set_yticklabels([])
+    ax.set_title('uV')
 
     return fig

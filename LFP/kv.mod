@@ -32,7 +32,7 @@ PARAMETER {
 	gbar = 5   	(pS/um2)	: 0.03 mho/cm2
 	v 		(mV)
 								
-	tha  = 25	(mV)		: v 1/2 for inf 
+	tha  = 25	(mV)		: v 1/2 for inf
 	qa   = 9	(mV)		: inf slope		
 	
 	Ra   = 0.02	(/ms)		: max act rate

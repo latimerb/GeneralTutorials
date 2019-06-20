@@ -33,20 +33,20 @@ NEURON {
 
 PARAMETER {
 	gbar = 1000   	(pS/um2)	: 0.12 mho/cm2
-	vshift = -5	(mV)		: voltage shift (affects all)
+	vshift = -88	(mV)		: voltage shift (affects all)
 								
 	tha  = -43	(mV)		: v 1/2 for act		(-42)
 	qa   = 6	(mV)		: act slope		
 	Ra   = 0.182	(/ms)		: open (v)		
 	Rb   = 0.124	(/ms)		: close (v)		
 
-	thi1  = -50	(mV)		: v 1/2 for inact 	:-50 :This is for alpha
-	thi2  = -75	(mV)		: v 1/2 for inact 	:-75 :This is for beta
-	qi   = 5	(mV)	        : inact tau slope : 5
-	thinf  = -72	(mV)		: inact inf slope	:-72
-	qinf  = 6.2	(mV)		: inact inf slope :6.2
-	Rg   = 0.0091	(/ms)		: inact (v)	:0.0091
-	Rd   = 0.024	(/ms)		: inact recov (v) :0.024
+	thi1  = -50	(mV)		: v 1/2 for inact 	
+	thi2  = -75	(mV)		: v 1/2 for inact 	
+	qi   = 5	(mV)	        : inact tau slope
+	thinf  = -72	(mV)		: inact inf slope	
+	qinf  = 6.2	(mV)		: inact inf slope
+	Rg   = 0.0091	(/ms)		: inact (v)	
+	Rd   = 0.024	(/ms)		: inact recov (v) 
 
 	temp = 23	(degC)		: original temp 
 	q10  = 2.3			: temperature sensitivity
@@ -131,11 +131,8 @@ PROCEDURE rates(vm) {
 
 	a = trap0(vm,thi1,Rd,qi)
 	b = trap0(-vm,-thi2,Rg,qi)
-	
 	htau = 1/(a+b)
 	hinf = 1/(1+exp((vm-thinf)/qinf))
-	
-	
 }
 
 

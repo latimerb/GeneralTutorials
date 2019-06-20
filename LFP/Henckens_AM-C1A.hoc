@@ -6,7 +6,7 @@ proc celldef() {
   geom_nseg()
 }
 
-create soma, dend[35], apic[22]
+create soma[1], dend[35], apic[22]
 
 proc topol() { local i
   connect dend(0), soma(0.5)

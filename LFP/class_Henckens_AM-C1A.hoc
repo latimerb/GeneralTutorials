@@ -1,13 +1,13 @@
-begintemplate Henckens_PyrAMC1A
+//begintemplate Henckens_PyrAMC1A
 
 
-public init, connect_sections, size_sections, append_sections, define_synapses
-public mechinit, insert_mechs, set_biophys, get_root
-public  pre_list, connect_pre, is_art, is_connected, gid, randi
-public soma, dend, axon
-public all, soma_list, axon_list, dendrite_list
-public x, y, z, position, myroot, myrootsec, Vrest
-public NumSoma, NumDend, NumAxon
+//public init, connect_sections, size_sections, append_sections, define_synapses
+//public mechinit, insert_mechs, set_biophys, get_root
+//public  pre_list, connect_pre, is_art, is_connected, gid, randi
+//public soma, dend, axon
+//public all, soma_list, axon_list, dendrite_list
+//public x, y, z, position, myroot, myrootsec, Vrest
+//public NumSoma, NumDend, NumAxon
 
 
 // strings
@@ -30,7 +30,7 @@ proc init() {
 	connect_sections()	// local fcn: connect soma, dendrites, axon initial segment
 	size_sections()		// local fcn: set the size dimensions of each section
 	define_shape()		// builtin fcn: fill in 3d info for sections defined by only L and diam, translate 3d points for consistency with their connections 
-  	append_sections()	// local fcn: append all sections to the section list
+  	//append_sections()	// local fcn: append all sections to the section list
 	//set_nseg()			// local fcn: set the number of segments in each section
 	//get_root()			// local fcn: perform morphology checks
 
@@ -1094,22 +1094,22 @@ proc size_sections() {
   
     basic_shape()
 
-	for i=0,9{
-		axon[i] {pt3dclear()
-			pt3dadd(-5*i, 0, 0, 1.0) 
-			pt3dadd(-2.5*(i+1), 0, 0, 1.0) 
-			pt3dadd(-5*(i+1), 0, 0, 1.0)
+	for i=1,10{
+		axon[i-1] {pt3dclear()
+			pt3dadd(-5*(i-1), 0, 0, 1.22)
+			pt3dadd(-5*(i-1)-5, 0, 0, 1.22)
 		}
 	}
+
 	axon[10]{pt3dclear()
-		pt3dadd(-50, 0, 0, 1.0) 
-		pt3dadd(-100, 0, 0, 1.0) 
-		pt3dadd(-150, 0, 0, 1.0)
+		pt3dadd(-50,0,0,1.22)
+		pt3dadd(-150,0,0,1.22)
 	}
+
 
 
 }
-
+/*
 
 objref all, dendrite_list, apical_list, soma_list, axon_list
 proc append_sections() { local i
@@ -1146,65 +1146,39 @@ external lambda_f
 proc set_nseg() {
   	forsec all { nseg = int((L/(0.1*lambda_f(100))+.9)/2)*2 + 1  }
 }
-
+*/
 
 proc mechinit() {
 
-	// resting membrane potential. Must lie between Na+ and K+ reversal potentials
-	Vrest=-80
-	
-	// Temperature of simulation
-	celsius = 34.0
-
-	// Membrane resistance in ohm*cm2
-	RmDend = 40000 //1/0.00018
-	RmSoma = 21000 //1/0.00018
-	RmAx = 1000
-	
-	// Membrane capacitance in uF/cm2
-	CmSoma= 1.5
-	CmDend = 1.5
-
-	// Axial resistance in ohm*cm
-	RaDend= 150
-	RaSoma= 150	
+	Cm = 1.0
+	RaAll= 150
+	RaSoma= 150
+	RaDend = 150
 	RaAx = 150
-	
-	// Calcium concentrations in mM
-	ca_outside = 2
-	ca_inside = 5.e-6 // 50.e-6
-	catau = 10
 
-	// reversal potentials in mV
-	ekval = -90
-	enaval = 45
-	eHCNval = -30
-	ecaval = 8.314*(273.15+celsius)/(2*9.649e4)*log(ca_outside/ca_inside)*1000 // about 170, otherwise set to 130
-	
-	if (Vrest<ekval) Vrest=ekval // Cell cannot rest lower than K+ reversal potential
-	if (Vrest>enaval) Vrest=enaval // Cell cannot rest higher than Na+ reversal potential
-	eleakval = Vrest
+	Rm = 30000
 
-	// max ion channel conductances in mho/cm2
-	gna = 0.015
-	gnap = 0.000559//0.000559 // 0.000551 
-	gkdr = 0.002//0.002 
-	ghd = 1.5e-5//1.5e-5
+	gna = 0.015 
+	gnap = 5e-4
+	gkdr = 0.002 //0.002 
+	ghd = 1.5e-5 //1.5e-5
 	gca = 5.5e-4 
 	gm = 0.00224 // 0.00222  
-	gsAHP = 0.05//0.0019
-	gkap = 0.002 
-			
+	gsAHP = 0.0005//0.0019
+	gkap = 0.002
+	gleak = 1/Rm //2.5e-5
+	gleak_dend= 1/Rm //1.57*3.0e-5
+					
 	nash=10
+	Vrest = -70
+	celsius = 31.0 
 
-	// axon channels
 	gna12_ais_max = 3000   // Nav1.2 
 	gna16_ais_max = 3200   // Nav1.6
 	gkv_axon = 1000
-	nash=10
-	
-	tha_na16 = -43
-	tha_na12 = -30
+
+	tha_na16 = -50 // Low threshold
+	tha_na12 = -30 // High threshold
 	
 }
 
@@ -1212,56 +1186,64 @@ proc insert_mechs() {
  
 
 	soma[0]{
-		Ra = RaSoma
-		cm=CmSoma
-		insert pas e_pas = -72 g_pas = 1/RmSoma
+		insert pas e_pas = -72  g_pas = gleak Ra=RaDend cm = Cm
+		insert na12  gbar_na12=gna12_ais_max/4 //Hu et al
+		insert kv    gbar_kv = gkv_axon/2
+		//insert nap gbar_nap = gnap
+		//insert kap gkabar_kap = gkap
+		/*
+		insert sAHP gsAHPbar_sAHP = gsAHP //causes adaptation
 		
 		insert cadyn gcabar_cadyn = gca  eca = 120
 		insert hd ghdbar_hd = ghd 
-		insert na3 sh_na3=nash ar_na3=1	gbar_na3 = 3*gna
-		insert nap gbar_nap = gnap
-		insert kdr gbar_kdr = gkdr
+		//insert kdr gbar_kdr = gkdr
 		insert capool taucas = 1000  fcas_capool = 0.05 //only in dend and p_dend
-		insert sAHP gsAHPbar_sAHP = gsAHP
 		insert im gbar_im = gm
-		insert kap gkabar_kap = gkap
-		
+			
+		//insert na3 sh_na3=nash ar_na3=1	gbar_na3 = 3*gna
+		*/
 	} 
 
 	for i=0,34{
 		dend[i] {
-			Ra = RaDend
-			cm = CmDend
-			insert pas e_pas = -72 g_pas = 1/RmDend
+			insert pas e_pas = -72  g_pas = gleak_dend Ra=RaDend cm = Cm
+			insert na12  gbar_na12 = gna12_ais_max/10
+			insert kv    gbar_kv = gkv_axon/10 //Hu et al.
+			//insert nap gbar_nap = 0 gbar_nap(1/(2*nseg)) = 1.0*gnap
+			//insert kap gkabar_kap = gkap
+			/*
+			insert cadyn gcabar_cadyn = gca  eca = 120	
+			insert hd ghdbar_hd = ghd
+			//insert na3 sh_na3=nash ar_na3=1	gbar_na3 = gna
 			
-			insert cadyn gcabar_cadyn = gca eca = 120
-			insert hd ghdbar_hd = ghd 
-			insert na3 sh_na3=nash ar_na3=1	gbar_na3 = gna
-			insert nap gbar_nap = 0  gbar_nap(1/(2*nseg)) = 0.8*gnap
-			insert kdr gbar_kdr = gkdr
+			//insert kdr gbar_kdr = gkdr
 			insert capool taucas = 1000  fcas_capool = 0.05 
 			insert sAHP gsAHPbar_sAHP = 0
-			insert im gbar_im = 0 gbar_im(1/(2*nseg)) = 0.8*gm
-			insert kap gkabar_kap = 0
+			insert im gbar_im = 0 gbar_im(1/(2*nseg)) = 1.0*gm
+			
+			*/
 			
 		}	
 	}
 
     for i=0,21{
 		apic[i] {
-			Ra = RaDend
-			cm = CmDend
-			insert pas e_pas = -72 g_pas = 1/RmDend
+			insert pas e_pas = -72  g_pas = gleak_dend Ra=RaDend cm = Cm
+			insert na12  gbar_na12=gna12_ais_max/10
+			insert kv    gbar_kv = gkv_axon/10 //Hu et al.
+			//insert nap gbar_nap = 0 gbar_nap(1/(2*nseg)) = 1.0*gnap
+			//insert kap gkabar_kap = gkap
+			/*
+			insert cadyn gcabar_cadyn = gca  eca = 120	
+			insert hd ghdbar_hd = ghd
+			//insert na3 sh_na3=nash ar_na3=1	gbar_na3 = gna
 			
-			insert cadyn gcabar_cadyn = gca eca = 120
-			insert hd ghdbar_hd = ghd 
-			insert na3 sh_na3=nash ar_na3=1	gbar_na3 = gna
-			insert nap gbar_nap = 0  gbar_nap(1/(2*nseg)) = 0.8*gnap
-			insert kdr gbar_kdr = gkdr
+			//insert kdr gbar_kdr = gkdr
 			insert capool taucas = 1000  fcas_capool = 0.05 
 			insert sAHP gsAHPbar_sAHP = 0
-			insert im gbar_im = 0 gbar_im(1/(2*nseg)) = 0.8*gm
-			insert kap gkabar_kap = 0
+			insert im gbar_im = 0 gbar_im(1/(2*nseg)) = 1.0*gm
+			
+			*/
 			
 		}	
 	}	
@@ -1269,26 +1251,28 @@ proc insert_mechs() {
 	for i=0,9 axon[i] {
 		insert pas
 		Ra = RaAx//50000
-		cm = 0.8 
-		g_pas = 1/(RmAx+200)
-		e_pas = -70
+		cm = Cm 
+		g_pas = 1/Rm
+		e_pas = -72
 		insert na12  //gbar_na12=0
 		insert na16  //gbar_na16=0
 		insert kv    //gbar_kv = 0
-		ena = 45
-		ek = -90
+		//ena = 45
+		//ek = -90
+		//insert nap gbar_nap = 2*gnap
 	}
 	axon[10]{
 		insert pas
 		Ra = RaAx
 		cm = 0.2 //myelin 
-		g_pas = 1/RmAx
-		e_pas = -70
+		g_pas = 1/Rm
+		e_pas = -72
 		insert na12  
 		insert na16  
 		insert kv    
-		ena = 45
-		ek = -90
+		//ena = 45
+		//ek = -90
+		//insert nap gbar_nap = gnap
 	}
 	
 	axon[0]. gbar_na12= gna12_ais_max      *	0.96	*	1             								
@@ -1427,4 +1411,4 @@ proc define_synapses() {
 	}
 }
 */
-endtemplate Henckens_PyrAMC1A
+//endtemplate Henckens_PyrAMC1A
