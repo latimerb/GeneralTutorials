@@ -730,14 +730,14 @@ def plot_elec_grid_stick(cell, electrode):
             else:
                 color = colors[int(np.floor((colors.shape[0]-1)*factor/max_factor)),:]
 
-        #print("electrode {} color: {}".format(i,color/255))
+        print("electrode {} color: {}".format(i,color/255))
         
         # Take zscore and adjust y axis        
         zscore = LFP[cell.tvec>50]/(np.max(LFP[cell.tvec>50])-np.min(LFP[cell.tvec>50]))
         trace = zscore*max_factor + electrode.z[i]
 
         ax.plot(tvec,trace, color=color/255, lw = 2)
-        #ax.text(tvec[0],trace[0],i)
+        ax.text(tvec[0],trace[0],i)
         i += 1
     #print("smallest: ",smallest)
     
