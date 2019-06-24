@@ -38,9 +38,9 @@ begintemplate Henckens_AMC1A
         RaAll= 150
         Rm = 30000
         Ena = 60
-        gna12_soma = 80
-        gna12_dend = 80 
-        gna12_ais_max = 3200   // Nav1.2 
+        gna12_soma = 0//80
+        gna12_dend = 0//80 
+        gna12_ais_max = 0//3200   // Nav1.2 
         gna16_ais_max = 3200   // Nav1.6
         gna16_nakeaxon= 300    
         gna12_myelin=20       // Nav1.2 at myelins
