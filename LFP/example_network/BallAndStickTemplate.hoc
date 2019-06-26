@@ -2,11 +2,11 @@
 BallAndStickTemplate.hoc
 ----------------------------------------------------------------------------- */
 begintemplate BallAndStickTemplate
-public init, soma, apic, dend//, axon, hill         
+public init, soma, apic, dend, hill, axon         
 public all
 objref all
 proc init() { all = new SectionList() }
-create soma[1], apic[1], dend[1]//, hill[1], axon[1]
+create soma[1], apic[1], dend[1], hill[1], axon[11]
 endtemplate BallAndStickTemplate
 
 

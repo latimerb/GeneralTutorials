@@ -172,10 +172,21 @@ def plot_ex1(cell, electrode, X, Y, Z, time_show, space_lim):
     plot the morphology and LFP contours, synaptic current and soma trace
     '''
     #figure object
-    fig = plt.figure(figsize=(5*len(time_show), 5))
+    fig = plt.figure(figsize=(2*len(time_show), 5))
     fig.subplots_adjust(left=None, bottom=None, right=None, top=None, 
-            wspace=0.2, hspace=0.2)
+            wspace=0.1, hspace=0.1)
+    ax0 = fig.add_subplot(2,1,1)
+    ax0.plot(cell.tvec,cell.synapses[0].i)
+        
+    ax0.set_xlim(49-0.4,63+0.4)
+    ax0.set_ylim(np.min(cell.synapses[0].i)-0.01,np.max(cell.synapses[0].i)+0.01)
+    ax0.set_xticks([])
+    ax0.set_xticklabels([])
+    ax0.set_yticks([])
+    ax0.set_yticklabels([])
+
     for i in np.arange(0,len(time_show)):
+        ax0.plot([time_show[i],time_show[i]],[-1,1],'k--')
         #some plot parameters
         t_show = time_show[i] #time point to show LFP
         tidx = np.where(cell.tvec == t_show)
@@ -187,7 +198,7 @@ def plot_ex1(cell, electrode, X, Y, Z, time_show, space_lim):
         LFP = np.arcsinh(electrode.LFP[:, tidx]).reshape(X.shape)
         
         # Plot LFP around the cell with in color and with equipotential lines
-        ax1 = fig.add_subplot(1,len(time_show),i+1)
+        ax1 = fig.add_subplot(2,len(time_show),i+len(time_show)+1)
         
         #plot_morphology(plot_synapses=True)
         for sec in LFPy.cell.neuron.h.allsec():
@@ -216,7 +227,7 @@ def plot_ex1(cell, electrode, X, Y, Z, time_show, space_lim):
         #cbar = fig.colorbar(ct1)
         #cbar.set_label('Potential (uV)',rotation=270)
         #cbar.ax1.set_yticklabels([])
-        ax1.set_title('LFP at t=' + str(t_show) + ' ms', fontsize=12)
+        #ax1.set_title('LFP at t=' + str(t_show) + ' ms', fontsize=12)
         ax1.set_xticks([])
         ax1.set_xticklabels([])
         ax1.set_yticks([])
