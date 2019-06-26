@@ -39,7 +39,7 @@ begintemplate Henckens_AMC1A
         Rm = 30000
         Ena = 60
         gna12_soma = 80
-        gna12_dend = 80 
+        gna12_dend = 80
         gna12_ais_max = 3200   // Nav1.2 
         gna16_ais_max = 3200   // Nav1.6
         gna16_nakeaxon= 300    
@@ -235,6 +235,7 @@ begintemplate Henckens_AMC1A
         for i = 16, 17 connect apic[i](0), apic[15](1)
         for i = 18, 19 connect apic[i](0), apic[17](1)
         for i = 20, 21 connect apic[i](0), apic[19](1)
+
 		connect hill[0](0), soma[0](0.5)
 		connect axon[0](0), hill[0](1)
 		for i=1,10{connect axon[i](0), axon[i-1](1)}

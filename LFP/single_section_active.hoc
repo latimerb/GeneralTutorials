@@ -1,16 +1,33 @@
 create soma[1]
 
 soma[0] {
-    pt3dadd(0, 0, 0, 10)
-    pt3dadd(0, 0, 500, 10)
+    pt3dadd(0, 0, 15, 15)
+    pt3dadd(0, 0, 515, 15)
 }
 
 soma[0] {
-    insert hh
+    cm = 1
+    Ra = 150
+    insert na16
+    insert kv
     insert pas
-    g_pas = 2.0e-5
+    g_pas = 1/30000
     e_pas = -70
-    gnabar_hh = 0.12
-    gkbar_hh = 0.012
-    gl_hh = 0
+    gbar_na16 = 3200
+    gbar_kv = 1000
+
+    vhalf_na12 = -30
+    vhalf_na16 = -43
+    vhalf_na = -30
+
+    vshift_na12 = -35 - vhalf_na12 -10  // negative shift of input voltage, high threshold  -30mV    
+    vshift_na16 = -35 - vhalf_na16 -10    // positive shift of input voltage, low threshold  -43mV
+    vshift_na = -35 - vhalf_na -10  // the same as Na12
 }
+
+
+
+
+
+
+

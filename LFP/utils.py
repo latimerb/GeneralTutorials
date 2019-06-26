@@ -2,32 +2,47 @@ import matplotlib.pyplot as plt
 import numpy as np
 import LFPy 
 import neuron
+import scipy.signal as ss
+import scipy.stats as st
 from matplotlib.collections import LineCollection
 
 def Plot_geo_currs_volt(cell,electrode,synapse):
 
     plt.figure(figsize=(15, 10))
-    plt.subplot(1,3,1)
+    plt.subplot(1,2,1)
     # Plot geometry of the cell
     for sec in LFPy.cell.neuron.h.allsec():
         idx = cell.get_idx(sec.name())
         plt.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
             np.r_[cell.zstart[idx], cell.zend[idx][-1]],
             'k',linewidth=8)
-        plt.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
-            np.r_[cell.zstart[idx], cell.zend[idx][-1]],
-            'r_')
+        #plt.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
+            #np.r_[cell.zstart[idx], cell.zend[idx][-1]],
+            #'r_')
         for i in np.arange(0,cell.xstart[idx].shape[0]):
             segs = [5,4,3,2,1]
-            plt.text(cell.xstart[idx][i]-75,cell.zend[idx][i]-50,'Seg. {}'.format(segs[i]))
+            #plt.text(cell.xstart[idx][i]-75,cell.zend[idx][i]-50,'Seg. {}'.format(segs[i]))
             # Plot synapse as red dot
             plt.plot([cell.synapses[0].x], [cell.synapses[0].z], \
                  color='r', marker='o', markersize=5,label='synapse')
             # Plot electrodes as green dots
             plt.plot(electrode.x, electrode.z, '.', marker='o', color='g',label='electrodes')
-        for i in np.arange(0,9):
-            plt.text(electrode.x[i]+10,electrode.z[i]-5,'{}'.format(i))
+        
+            plt.xlabel('distance (um)')
+            plt.ylabel('distance (um)')
+        
+            plt.ylim(-750,750)
+            plt.xlim(-750,750)
 
+        i=0
+        for LFP in electrode.LFP:
+            tvec = cell.tvec[cell.tvec>40]*4 + electrode.x[i] - 150
+            #zscore = (LFP[cell.tvec>40]-np.mean(LFP[cell.tvec>40]))/np.std(LFP[cell.tvec>40])
+            trace = 50000*LFP[cell.tvec>40]+electrode.z[i]
+
+            plt.plot(tvec,trace,'k')
+            plt.text(electrode.x[i],electrode.z[i],'{}'.format(i))
+            i+=1
             # Plot distances used in LFP calculation
             #elec_idx = 2
             #seg_idx = 1
@@ -41,34 +56,31 @@ def Plot_geo_currs_volt(cell,electrode,synapse):
             #l = -200*np.ones((113,))
             #ly = np.arange(-12.5,100)
             #plot(l,ly,color=[0.5,0.5,0.5]), text(-180,40,'l')
-            plt.xlabel('distance (um)')
-            plt.ylabel('distance (um)')
+            
+            #plt.legend()
         
-            plt.ylim(-450,450)
-            plt.xlim(-350,100)
-            plt.legend()
-        
-            sp = [14,11,8,5,2]
+            sp = [10,8,6,4,2]
             segs = [5,4,3,2,1]
         for i in np.arange(1,6):
-            ax=plt.subplot(5,3,sp[i-1])
+            ax=plt.subplot(5,2,sp[i-1])
             plt.plot(cell.tvec,cell.imem[i-1,:],'blue',label='imembrane')
             plt.plot(cell.tvec,cell.ipas[i-1,:],'red',label='i_pas')
             plt.plot(cell.tvec,cell.icap[i-1,:],'green',label='i_cap')
-            
+            plt.xlim(45,75)
+
             if i!=5:
                 plt.text(45,0.06,'segment {}'.format(segs[i-1]))
-                plt.ylim(-0.02,0.11)
-            
+                plt.ylim(-0.5,0.7)
+                
             else:
                 plt.text(45,-0.1,'segment {}'.format(segs[i-1]))
                 ax.plot(cell.tvec, synapse.i,'m',label='i_syn')
                 plt.legend(loc='lower right')
                 plt.title('currents (nA)')
-                plt.ylim(-0.5,0.11)
+                #plt.ylim(-0.6,0.2)
             if i==1:
                 plt.xlabel('time (ms)')
-                plt.xlim(42.5,62.5)
+                
             
             
         #### Calculate extracellular potential by hand
@@ -86,118 +98,74 @@ def Plot_geo_currs_volt(cell,electrode,synapse):
         #dist = np.log((np.sqrt(h**2+r**2)-h)/(np.sqrt(l**2+r**2)-l))
         #v_ext=1000*(1/(4*np.pi*300*5))*np.dot(np.transpose(cell.imem),dist)
     
-        elecs_to_plot = [8,5,0]
-        for i in np.arange(1,4):
-            ax=plt.subplot(3,3,3*i)
-            plt.plot(cell.tvec,electrode.LFP[elecs_to_plot[i-1],:],'k')
-            plt.xlim(42.5,62.5)
-            plt.text(45,0.000002,'electrode {}'.format(elecs_to_plot[i-1]))
-            ax.yaxis.tick_right()
-            if i==1:
-                #plot(cell.tvec,v_ext,'k')
-                plt.title('extracellular voltage (mV)')
-            if i==3:
-                plt.xlabel('time(ms)')
-                plt.ylim(-0.0001,0.0001)    
+        
 
 
-def Plot_active_currs_volt(cell,electrode,synapse):
-
+def Plot_ball_and_stick(cell,electrode,synapse):
     plt.figure(figsize=(15, 10))
-    plt.subplot(1,3,1)
+    plt.subplot(1,2,1)
     # Plot geometry of the cell
     for sec in LFPy.cell.neuron.h.allsec():
         idx = cell.get_idx(sec.name())
+        print(sec.name())
+        if sec.name()=="axon[0]":
+            lw = 2
+        if sec.name()=="soma[0]":
+            lw = 20
+        if sec.name()=="dend[0]":
+            lw = 7
         plt.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
             np.r_[cell.zstart[idx], cell.zend[idx][-1]],
-            'k',linewidth=8)
-        plt.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
-            np.r_[cell.zstart[idx], cell.zend[idx][-1]],
-            'r_')
-        for i in np.arange(0,cell.xstart[idx].shape[0]):
-            segs = [5,4,3,2,1]
-            plt.text(cell.xstart[idx][i]-75,cell.zend[idx][i]-50,'Seg. {}'.format(segs[i]))
-            # Plot synapse as red dot
+            'k',linewidth=lw)
+       
+      
+        # Plot synapse as red dot
         plt.plot([cell.synapses[0].x], [cell.synapses[0].z], \
-            color='r', marker='o', markersize=5,label='synapse')
+                 color='r', marker='o', markersize=5,label='synapse')
         # Plot electrodes as green dots
         plt.plot(electrode.x, electrode.z, '.', marker='o', color='g',label='electrodes')
-    for i in np.arange(0,9):
-        plt.text(electrode.x[i]+10,electrode.z[i]-5,'{}'.format(i))
-
-    # Plot distances used in LFP calculation
-    #elec_idx = 2
-    #seg_idx = 1
-    #idx = cell.get_idx('soma[0]')
-    #xr = np.arange(cell.xstart[idx][0],0)
-    #yr = electrode.z[elec_idx]*np.ones((xr.shape[0],))
-    #plot(xr,yr,color=[0.5,0.5,0.5]),text(cell.xstart[idx][0]/2,electrode.z[elec_idx]+5,'r')
-    #h = -250*np.ones((86,))
-    #hy = np.arange(14,100)
-    #plot(h,hy,color=[0.5,0.5,0.5]),text(-240,50,'h')
-    #l = -200*np.ones((113,))
-    #ly = np.arange(-12.5,100)
-    #plot(l,ly,color=[0.5,0.5,0.5]), text(-180,40,'l')
-    plt.xlabel('distance (um)')
-    plt.ylabel('distance (um)')
-
-    plt.ylim(-450,1200)
-    plt.xlim(-350,100)
-    plt.legend()
-
-    sp = [14,11,8,5,2]
-    segs = [5,4,3,2,1]
-    for i in np.arange(1,6):
-        ax=plt.subplot(5,3,sp[i-1])
-        plt.plot(cell.tvec,cell.imem[i-1,:],'blue',label='imembrane')
-        plt.plot(cell.tvec,cell.ipas[i-1,:],'red',label='i_pas')
-        #plt.plot(cell.tvec,cell.icap[i-1,:],'green',label='i_cap')
-        plt.plot(cell.tvec,cell.rec_variables['ina'][i-1,:],'black',label='i_na')
-        plt.plot(cell.tvec,cell.rec_variables['ik'][i-1,:],'cyan',label='i_k')
         
-        if i!=5:
-            plt.text(45,0.06,'segment {}'.format(segs[i-1]))
-            #plt.ylim(-0.02,0.11)
+        # Plot LFP
+        i=0
+        for LFP in electrode.LFP:
+            tvec = cell.tvec[cell.tvec>40]*4 + electrode.x[i] - 150
+            #zscore = (LFP[cell.tvec>40]-np.mean(LFP[cell.tvec>40]))/np.std(LFP[cell.tvec>40])
+            trace = 50000*LFP[cell.tvec>40]+electrode.z[i]
+
+            plt.plot(tvec,trace,'k')
+            i+=1
+
+        # Labels and lims
+        plt.xlabel('distance (um)')
+        plt.ylabel('distance (um)')
         
-        else:
-            plt.text(45,-0.1,'segment {}'.format(segs[i-1]))
-            ax.plot(cell.tvec, synapse.i,'m',label='i_syn')
-            plt.legend(loc='lower right')
-            plt.title('currents (nA)')
-            #plt.ylim(-0.5,0.11)
-        if i==1:
-            plt.xlabel('time (ms)')
-            plt.xlim(42.5,62.5)
-        
-        
-    #### Calculate extracellular potential by hand
+        plt.ylim(-750,750)
+        plt.xlim(-750,750)
 
-    # electrode 5 is at 0,100
-    #h = np.zeros((5,1))
-    #l = np.zeros((5,1))
-    #r = np.zeros((5,1))
+        # Plot currents
+        #sp = [10,8,6,4,2]
+        #segs = [5,4,3,2,1]
+        #for i in np.arange(1,6):
+            #ax=plt.subplot(5,2,sp[i-1])
+            #plt.plot(cell.tvec,cell.imem[i-1,:],'blue',label='imembrane')
+            #plt.plot(cell.tvec,cell.ipas[i-1,:],'red',label='i_pas')
+            #plt.plot(cell.tvec,cell.icap[i-1,:],'green',label='i_cap')
+            #plt.xlim(45,75)
 
-    #for i in np.arange(0,5):
-    #    h[i,0] = electrode.z[5]-cell.zend[i]
-    #    l[i,0] = electrode.z[5]-cell.zstart[i]
-    #    r[i,0] = electrode.x[5]-cell.xstart[i]
+            #if i!=5:
+                #plt.text(45,0.06,'segment {}'.format(segs[i-1]))
+                #plt.ylim(-0.5,0.7)
+                
+            #else:
+                #plt.text(45,-0.1,'segment {}'.format(segs[i-1]))
+                #ax.plot(cell.tvec, synapse.i,'m',label='i_syn')
+                #plt.legend(loc='lower right')
+                #plt.title('currents (nA)')
+                #plt.ylim(-0.6,0.2)
+            #if i==1:
+                #plt.xlabel('time (ms)')
 
-    #dist = np.log((np.sqrt(h**2+r**2)-h)/(np.sqrt(l**2+r**2)-l))
-    #v_ext=1000*(1/(4*np.pi*300*5))*np.dot(np.transpose(cell.imem),dist)
 
-    elecs_to_plot = [12,5,0]
-    for i in np.arange(1,4):
-        ax=plt.subplot(3,3,3*i)
-        plt.plot(cell.tvec,electrode.LFP[elecs_to_plot[i-1],:],'k')
-        plt.xlim(42.5,62.5)
-        plt.text(45,0.000002,'electrode {}'.format(elecs_to_plot[i-1]))
-        ax.yaxis.tick_right()
-        if i==1:
-            #plot(cell.tvec,v_ext,'k')
-            plt.title('extracellular voltage (mV)')
-        if i==3:
-            plt.xlabel('time(ms)')
-            plt.ylim(-0.001,0.001)  
 
 def plot_ex1(cell, electrode, X, Y, Z, time_show, space_lim):
     '''
@@ -730,14 +698,14 @@ def plot_elec_grid_stick(cell, electrode):
             else:
                 color = colors[int(np.floor((colors.shape[0]-1)*factor/max_factor)),:]
 
-        print("electrode {} color: {}".format(i,color/255))
+        #print("electrode {} color: {}".format(i,color/255))
         
         # Take zscore and adjust y axis        
         zscore = LFP[cell.tvec>50]/(np.max(LFP[cell.tvec>50])-np.min(LFP[cell.tvec>50]))
         trace = zscore*max_factor + electrode.z[i]
 
         ax.plot(tvec,trace, color=color/255, lw = 2)
-        ax.text(tvec[0],trace[0],i)
+        #ax.text(tvec[0],trace[0],i)
         i += 1
     #print("smallest: ",smallest)
     
@@ -784,3 +752,132 @@ def plot_elec_grid_stick(cell, electrode):
     ax.set_title('uV')
 
     return fig
+
+def decimate(x, q=10, n=4, k=0.8, filterfun=ss.cheby1):
+    """
+    scipy.signal.decimate like downsampling using filtfilt instead of lfilter,
+    and filter coeffs from butterworth or chebyshev type 1.
+
+    Parameters
+    ----------
+    x : ndarray
+        Array to be downsampled along last axis.
+    q : int
+        Downsampling factor.
+    n : int
+        Filter order.
+    k : float
+        Aliasing filter critical frequency Wn will be set as Wn=k/q.
+    filterfun : function
+        `scipy.signal.filter_design.cheby1` or
+        `scipy.signal.filter_design.butter` function
+
+    Returns
+    -------
+    ndarray
+        Downsampled signal.
+
+    """
+    if not isinstance(q, int):
+        raise TypeError("q must be an integer")
+
+    if n is None:
+        n = 1
+
+    if filterfun == ss.butter:
+        b, a = filterfun(n, k / q)
+    elif filterfun == ss.cheby1:
+        b, a = filterfun(n, 0.05, k / q)
+    else:
+        raise Exception('only ss.butter or ss.cheby1 supported')
+
+    try:
+        y = ss.filtfilt(b, a, x)
+    except: # Multidim array can only be processed at once for scipy >= 0.9.0
+        y = []
+        for data in x:
+            y.append(ss.filtfilt(b, a, data))
+        y = np.array(y)
+
+    try:
+        return y[:, ::q]
+    except:
+        return y[::q]
+
+def remove_axis_junk(ax, lines=['right', 'top']):
+    """remove chosen lines from plotting axis"""
+    for loc, spine in ax.spines.items():
+        if loc in lines:
+            spine.set_color('none')
+    ax.xaxis.set_ticks_position('bottom')
+    ax.yaxis.set_ticks_position('left')
+
+def draw_lineplot(
+        ax, data, dt=0.1,
+        T=(0, 200),
+        scaling_factor=1.,
+        vlimround=None,
+        label='local',
+        scalebar=True,
+        unit='mV',
+        ylabels=True,
+        color='r',
+        ztransform=True,
+        filter=False,
+        filterargs=dict(N=2, Wn=0.02, btype='lowpass')):
+    """helper function to draw line plots"""
+    tvec = np.arange(data.shape[1])*dt
+    tinds = (tvec >= T[0]) & (tvec <= T[1])
+
+    # apply temporal filter
+    if filter:
+        b, a = ss.butter(**filterargs)
+        data = ss.filtfilt(b, a, data, axis=-1)
+
+    #subtract mean in each channel
+    if ztransform:
+        dataT = data.T - data.mean(axis=1)
+        data = dataT.T
+
+    zvec = -np.arange(data.shape[0])
+    vlim = abs(data[:, tinds]).max()
+    if vlimround is None:
+        vlimround = 2.**np.round(np.log2(vlim)) / scaling_factor
+    else:
+        pass
+
+    yticklabels=[]
+    yticks = []
+
+    for i, z in enumerate(zvec):
+        if i == 0:
+            ax.plot(tvec[tinds], data[i][tinds] / vlimround + z, lw=1,
+                    rasterized=False, label=label, clip_on=False,
+                    color=color)
+        else:
+            ax.plot(tvec[tinds], data[i][tinds] / vlimround + z, lw=1,
+                    rasterized=False, clip_on=False,
+                    color=color)
+        yticklabels.append('ch. %i' % (i+1))
+        yticks.append(z)
+
+    if scalebar:
+        ax.plot([tvec[-1], tvec[-1]],
+                [-1, -2], lw=2, color='k', clip_on=False)
+        ax.text(tvec[-1]+np.diff(T)*0.02, -1.5,
+                '$2^{' + '{}'.format(np.log2(vlimround)) + '}$ ' + '{0}'.format(unit),
+                color='k', rotation='vertical',
+                va='center')
+
+    ax.axis(ax.axis('tight'))
+    ax.yaxis.set_ticks(yticks)
+    if ylabels:
+        ax.yaxis.set_ticklabels(yticklabels)
+        ax.set_ylabel('channel', labelpad=0.1)
+    else:
+        ax.yaxis.set_ticklabels([])
+    remove_axis_junk(ax, lines=['right', 'top'])
+    ax.set_xlabel(r't (ms)', labelpad=0.1)
+
+    return vlimround
+

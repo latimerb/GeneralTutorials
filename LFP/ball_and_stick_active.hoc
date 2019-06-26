@@ -1,33 +1,80 @@
-create soma[1], dend[1]
+create soma[1],axon[1],dend[1]
 
 soma[0] {
-    pt3dadd(0, 0, 0, 25)
-    pt3dadd(0, 0, 25, 25)
+    pt3dadd(0, 0, 0, 15)
+    pt3dadd(0, 0, 15, 15)
 }
 
 dend[0] {
-    pt3dadd(0,0,25,10)
-    pt3dadd(0,0,525,10)
+    pt3dadd(0, 0, 0, 5)
+    pt3dadd(0, 0, -200, 5)
 }
 
-connect soma[0](1), dend[0](0)
+axon[0] {
+    pt3dadd(0, 0, 15, 15)
+    pt3dadd(0, 0, 515, 15)
+}
 
-soma[0]{
-    insert hh
+connect dend[0](0),soma[0](0)
+connect axon[0](0),soma[0](1)
+
+axon[0] {
+    cm = 1
+    Ra = 150
+    insert na16
+    insert kv
     insert pas
-    gnabar_hh=0.12
-    gkbar_hh=0.001
-    glbar_hh=0
-    g_pas = 0.0001
-    //e_pas = -70
+    g_pas = 1/30000
+    e_pas = -70
+    gbar_na16 = 3200
+    gbar_kv = 1000
+
+    vhalf_na12 = -30
+    vhalf_na16 = -43
+    vhalf_na = -30
+
+    vshift_na12 = -35 - vhalf_na12 -10  // negative shift of input voltage, high threshold  -30mV    
+    vshift_na16 = -35 - vhalf_na16 -10    // positive shift of input voltage, low threshold  -43mV
+    vshift_na = -35 - vhalf_na -10  // the same as Na12
 }
 
-dend[0]{
-    insert hh
+dend[0] {
+    cm = 1
+    Ra = 150
+    insert na12
+    insert kv
     insert pas
-    gnabar_hh=0.12/10
-    gkbar_hh=0.001/10
-    glbar_hh=0
-    g_pas = 0.0001
-    //e_pas = -70
+    g_pas = 1/30000
+    e_pas = -70
+    gbar_na12 = 0//80
+    gbar_kv = 0//10
+
+    vhalf_na12 = -30
+    vhalf_na16 = -43
+    vhalf_na = -30
+
+    vshift_na12 = -35 - vhalf_na12 -10  // negative shift of input voltage, high threshold  -30mV    
+    vshift_na16 = -35 - vhalf_na16 -10    // positive shift of input voltage, low threshold  -43mV
+    vshift_na = -35 - vhalf_na -10  // the same as Na12
 }
+
+soma[0] {
+    cm = 1
+    Ra = 150
+    insert na12
+    insert kv
+    insert pas
+    g_pas = 1/30000
+    e_pas = -70
+    gbar_na12 = 0//80
+    gbar_kv = 0//10
+
+    vhalf_na12 = -30
+    vhalf_na16 = -43
+    vhalf_na = -30
+
+    vshift_na12 = -35 - vhalf_na12 -10  // negative shift of input voltage, high threshold  -30mV    
+    vshift_na16 = -35 - vhalf_na16 -10    // positive shift of input voltage, low threshold  -43mV
+    vshift_na = -35 - vhalf_na -10  // the same as Na12
+}
+
