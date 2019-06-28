@@ -30,9 +30,9 @@ cellParameters = {
 
 SynapseParameters = {
     'syntype' : 'Exp2Syn',
-    'e' : -50,
+    'e' : -75,
     'tau1' : 0.83,
-    'tau2' : 2.2,
+    'tau2' : 4.2,
     'weight' : 0.009,
     'record_current' : True,
 }
@@ -40,7 +40,7 @@ SynapseParameters = {
 
 # Define electrode parameters
 # Create a grid of measurement locations, in (mum)
-X, Z = np.mgrid[-350:501:20, -350:601:20]
+X, Z = np.mgrid[-650:801:20, -650:901:20]
 Y = np.zeros(X.shape)
 
 electrodeParameters = {
@@ -140,8 +140,8 @@ inh_ct = []
 rat_ct = []
 for i in np.arange(0,len(t_show)):
 
-    exc = pd.read_csv('./data/stick/excitatory_LFP_at_{}.csv'.format(t_show[i]),header=None)
-    inh = pd.read_csv('./data/stick/inhibitory_LFP_at_{}.csv'.format(t_show[i]),header=None)
+    exc = pd.read_csv('./data/stick/zoomoutexcitatory_LFP_at_{}.csv'.format(t_show[i]),header=None)
+    inh = pd.read_csv('./data/stick/zoomoutinhibitory_LFP_at_{}.csv'.format(t_show[i]),header=None)
 
     ratio = np.divide(np.abs(exc.values),np.abs(inh.values))
 
@@ -150,8 +150,8 @@ for i in np.arange(0,len(t_show)):
     hm1=plt.matshow(np.abs(A),norm=colors.LogNorm(vmin=10e-5,vmax=1),cmap=cm.jet,fignum=0)
     ex_ct.append(hm1)
     if i==0:
-        plt.plot([31,36],[44,44],'k-')
-        plt.plot([31,31],[44,39],'k-')
+        plt.plot([61,66],[74,74],'k-')
+        plt.plot([61,61],[74,69],'k-')
     plt.axis('off')
 
     plt.subplot(3,len(t_show),i+len(t_show)+1)
@@ -159,8 +159,8 @@ for i in np.arange(0,len(t_show)):
     hm2=plt.matshow(np.abs(B),norm=colors.LogNorm(vmin=10e-5,vmax=1),cmap=cm.jet,fignum=0)
     inh_ct.append(hm2)
     if i==0:
-        plt.plot([31,36],[44,44],'k-')
-        plt.plot([31,31],[44,39],'k-')
+        plt.plot([61,66],[74,74],'k-')
+        plt.plot([61,61],[74,69],'k-')
     plt.axis('off')
 
     plt.subplot(3,len(t_show),i+2*len(t_show)+1)
@@ -169,8 +169,8 @@ for i in np.arange(0,len(t_show)):
     hm=plt.matshow(C,cmap=cm.OrRd,norm=colors.BoundaryNorm(boundaries=bounds,ncolors=256),fignum=0)
     rat_ct.append(hm)
     if i==0:
-        plt.plot([31,36],[44,44],'k-')
-        plt.plot([31,31],[44,39],'k-')
+        plt.plot([61,66],[74,74],'k-')
+        plt.plot([61,61],[74,69],'k-')
     hm.set_clim(0,10)
     plt.axis('off')
 
@@ -180,7 +180,7 @@ cbaxes2 = fig.add_axes([0.85,0.27,0.03,0.23])
 cbar = plt.colorbar(inh_ct[0],cax=cbaxes2)
 cbaxes3 = fig.add_axes([0.85,0.02,0.03,0.23])
 cbar = plt.colorbar(rat_ct[0],cax=cbaxes3)
-fig.savefig('heatmaps.svg',bbox_inches='tight',pad_inches=0)
+fig.savefig('heatmaps_zoomout.svg',bbox_inches='tight',pad_inches=0)
 #from utils import contour3d,plot_elec_grid_stick,zerosurf,plot_ex1
 
 #plot_ex1(cell,electrode,X,Y,Z,time_show=[50,53,56,59,62],space_lim=[np.min(X[:,0]),np.max(X[:,0]),np.min(Z[0,:]),np.max(Z[0,:])])
