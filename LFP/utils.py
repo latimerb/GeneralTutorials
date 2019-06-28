@@ -180,8 +180,8 @@ def plot_ex1(cell, electrode, X, Y, Z, time_show, space_lim):
             wspace=0.1, hspace=0.1)
     ax0 = fig.add_subplot(2,1,1)
     ax0.plot(cell.tvec,cell.synapses[0].i)
-    ax0.plot([time_show[0]+1,time_show[0]+1],[cell.synapses[0].i[0],cell.synapses[0].i[0]-0.01],'k-')
-    ax0.text(time_show[0]+1+0.01,cell.synapses[0].i[0]-0.008,'10 pA')
+    ax0.plot([time_show[0]+1,time_show[0]+1],[cell.synapses[0].i[0],cell.synapses[0].i[0]+0.01],'k-')
+    ax0.text(time_show[0]+1+0.01,cell.synapses[0].i[0]+0.004,'10 pA')
 
     ax0.set_xlim(49-0.4,63+0.4)
     ax0.set_ylim(np.min(cell.synapses[0].i)-0.01,np.max(cell.synapses[0].i)+0.01)

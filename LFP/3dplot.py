@@ -10,8 +10,8 @@ import neuron
 
 cellParameters = {
     'morphology': 'Henckens_AM-C1A.swc',
-    'templatefile': ['stylized_pyrtypeC_LFPytemplate.hoc'],
-    'templatename': 'stylized_pyrtypeC',
+    'templatefile': ['Henckens_AM-C1A_LFPytemplate.hoc'],
+    'templatename': 'Henckens_AMC1A',
     'passive_parameters':{'g_pas':1./30000,'e_pas':-70.},
     'tstart' : 0,
     'tstop' : 70,
@@ -29,9 +29,9 @@ cellParameters = {
 
 SynapseParameters = {
     'syntype' : 'Exp2Syn',
-    'e' : -50,
+    'e' : -75,
     'tau1' : 0.83,
-    'tau2' : 2.2,
+    'tau2' : 4.2,
     'weight' : 0.009,
     'record_current' : True,
 }
@@ -56,7 +56,7 @@ LFPy.cell.neuron.h("forall delete_section()")
 # Create cell and print the variables belonging to it.
 cell = LFPy.TemplateCell(**cellParameters)
 cell.set_pos(x=0, y=0, z=0)
-cell.set_rotation(z=np.pi,x=np.pi/2)
+cell.set_rotation(z=np.pi,x=0)
 
 #from pprint import pprint
 #print(pprint(vars(cell)))
