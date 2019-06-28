@@ -29,9 +29,9 @@ cellParameters = {
 
 SynapseParameters = {
     'syntype' : 'Exp2Syn',
-    'e' : -75,
+    'e' : -50,
     'tau1' : 0.83,
-    'tau2' : 4.2,
+    'tau2' : 2.2,
     'weight' : 0.009,
     'record_current' : True,
 }
