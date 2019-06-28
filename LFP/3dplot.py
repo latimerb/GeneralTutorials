@@ -133,7 +133,7 @@ import matplotlib.colors as colors
 
 t_show = [50,53,56,59,62]
 
-fig = plt.figure()
+fig = plt.figure(figsize=(10,8))
 fig.subplots_adjust(left=0.005,bottom=0.005,right=0.83,top=0.76,wspace=0.1,hspace=0.01)
 ex_ct = []
 inh_ct = []
@@ -147,7 +147,7 @@ for i in np.arange(0,len(t_show)):
 
     plt.subplot(3,len(t_show),i+1)
     A = exc.values.T[::-1]
-    hm1=plt.imshow(np.abs(A),norm=colors.LogNorm(vmin=10e-5,vmax=1),cmap=cm.jet,interpolation="none")
+    hm1=plt.matshow(np.abs(A),norm=colors.LogNorm(vmin=10e-5,vmax=1),cmap=cm.jet,fignum=0)
     ex_ct.append(hm1)
     if i==0:
         plt.plot([31,36],[44,44],'k-')
@@ -156,7 +156,7 @@ for i in np.arange(0,len(t_show)):
 
     plt.subplot(3,len(t_show),i+len(t_show)+1)
     B = inh.values.T[::-1]
-    hm2=plt.imshow(np.abs(B),norm=colors.LogNorm(vmin=10e-5,vmax=1),cmap=cm.jet,interpolation="none")
+    hm2=plt.matshow(np.abs(B),norm=colors.LogNorm(vmin=10e-5,vmax=1),cmap=cm.jet,fignum=0)
     inh_ct.append(hm2)
     if i==0:
         plt.plot([31,36],[44,44],'k-')
@@ -166,7 +166,7 @@ for i in np.arange(0,len(t_show)):
     plt.subplot(3,len(t_show),i+2*len(t_show)+1)
     C = np.divide(np.abs(A),np.abs(B))
     bounds = np.linspace(0,10,11)
-    hm=plt.imshow(C,cmap=cm.OrRd,norm=colors.BoundaryNorm(boundaries=bounds,ncolors=256),interpolation="none")
+    hm=plt.matshow(C,cmap=cm.OrRd,norm=colors.BoundaryNorm(boundaries=bounds,ncolors=256),fignum=0)
     rat_ct.append(hm)
     if i==0:
         plt.plot([31,36],[44,44],'k-')
