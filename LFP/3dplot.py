@@ -180,7 +180,7 @@ cbaxes2 = fig.add_axes([0.85,0.27,0.03,0.23])
 cbar = plt.colorbar(inh_ct[0],cax=cbaxes2)
 cbaxes3 = fig.add_axes([0.85,0.02,0.03,0.23])
 cbar = plt.colorbar(rat_ct[0],cax=cbaxes3)
-fig.savefig('heatmaps.tiff',bbox_inches='tight',pad_inches=0)
+fig.savefig('heatmaps.svg',bbox_inches='tight',pad_inches=0)
 #from utils import contour3d,plot_elec_grid_stick,zerosurf,plot_ex1
 
 #plot_ex1(cell,electrode,X,Y,Z,time_show=[50,53,56,59,62],space_lim=[np.min(X[:,0]),np.max(X[:,0]),np.min(Z[0,:]),np.max(Z[0,:])])
