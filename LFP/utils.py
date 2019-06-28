@@ -5,6 +5,9 @@ import neuron
 import scipy.signal as ss
 import scipy.stats as st
 from matplotlib.collections import LineCollection
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+import matplotlib.colors as colors
 
 def Plot_geo_currs_volt(cell,electrode,synapse):
 
@@ -173,11 +176,13 @@ def plot_ex1(cell, electrode, X, Y, Z, time_show, space_lim):
     '''
     #figure object
     fig = plt.figure(figsize=(2*len(time_show), 5))
-    fig.subplots_adjust(left=None, bottom=None, right=None, top=None, 
+    fig.subplots_adjust(left=None, bottom=None, right=0.8, top=None, 
             wspace=0.1, hspace=0.1)
     ax0 = fig.add_subplot(2,1,1)
     ax0.plot(cell.tvec,cell.synapses[0].i)
-        
+    ax0.plot([time_show[0]+1,time_show[0]+1],[cell.synapses[0].i[0],cell.synapses[0].i[0]-0.01],'k-')
+    ax0.text(time_show[0]+1+0.01,cell.synapses[0].i[0]-0.008,'10 pA')
+
     ax0.set_xlim(49-0.4,63+0.4)
     ax0.set_ylim(np.min(cell.synapses[0].i)-0.01,np.max(cell.synapses[0].i)+0.01)
     ax0.set_xticks([])
@@ -185,6 +190,7 @@ def plot_ex1(cell, electrode, X, Y, Z, time_show, space_lim):
     ax0.set_yticks([])
     ax0.set_yticklabels([])
 
+    ct = []
     for i in np.arange(0,len(time_show)):
         ax0.plot([time_show[i],time_show[i]],[-1,1],'k--')
         #some plot parameters
@@ -212,21 +218,18 @@ def plot_ex1(cell, electrode, X, Y, Z, time_show, space_lim):
                 ax1.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
                     np.r_[cell.zstart[idx], cell.zend[idx][-1]],
                     color=[0.7,0.7,0.7],lw=2)
-        for i in range(len(cell.synapses)):
-            ax1.plot([cell.synapses[i].x], [cell.synapses[i].z], '.',
-                #color=cell.synapses[i].color, marker=cell.synapses[i].marker,
+        for j in range(len(cell.synapses)):
+            ax1.plot([cell.synapses[j].x], [cell.synapses[j].z], '.',
+                #color=cell.synapses[j].color, marker=cell.synapses[j].marker,
                 markersize=10)
         
         #contour lines
-        ct1 = ax1.contourf(X, Z, LFP, n_contours)
-        ct1.set_clim((-0.00007, 0.00002))
-        ct2 = ax1.contour(X, Z, LFP, n_contours_black, colors='k')
+        ct.append(ax1.contourf(X, Z, LFP*1000, n_contours,vmin=-0.00007*1000,vmax=0.00002*1000))
+        ct[i].set_clim((-0.00007*1000, 0.00002*1000))
+        ct2 = ax1.contour(X, Z, LFP*1000, n_contours_black, colors='k')
 
         # Figure formatting and labels
 
-        #cbar = fig.colorbar(ct1)
-        #cbar.set_label('Potential (uV)',rotation=270)
-        #cbar.ax1.set_yticklabels([])
         #ax1.set_title('LFP at t=' + str(t_show) + ' ms', fontsize=12)
         ax1.set_xticks([])
         ax1.set_xticklabels([])
@@ -242,7 +245,11 @@ def plot_ex1(cell, electrode, X, Y, Z, time_show, space_lim):
             #ax1.text(x1+1, y2-150, '100 um')
             ax1.plot([x1+70, x1+170], [y2-200,y2-200], color='k', lw=2)
             #ax1.text(x1+80, y2-230, '100 um')
-
+    
+    #[right/left,top/bottom,width,height]
+    cbaxes = fig.add_axes([0.82,0.11,0.03,0.36])
+    cbar = plt.colorbar(ct[1],cax=cbaxes)
+    #cbar.set_label('Potential (uV)',rotation=270)
     #fig2 = plt.figure(figsize=(15, 6))
     # Plot synaptic input current
     #ax2 = fig2.add_subplot(121)
@@ -891,4 +898,85 @@ def draw_lineplot(
     ax.set_xlabel(r't (ms)', labelpad=0.1)
 
     return vlimround
+
+import pdb
+
+def contour3d(cell,electrode,X,Y,Z,tshow):
+    
+    tidx = cell.tvec==tshow
+
+#    for sec in LFPy.cell.neuron.h.allsec():
+#        idx = cell.get_idx(sec.name())
+#        if sec.name()=="stylized_pyrtypeC[0].soma[0]":
+#            ax.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
+#                np.r_[cell.ystart[idx], cell.yend[idx][-1]],
+#                np.r_[cell.zstart[idx], cell.zend[idx][-1]],
+#                color=[0.7,0.7,0.7],linewidth=8)
+#        else:
+#            ax.plot(np.r_[cell.xstart[idx], cell.xend[idx][-1]],
+#                np.r_[cell.ystart[idx], cell.yend[idx][-1]],
+#                np.r_[cell.zstart[idx], cell.zend[idx][-1]],
+#                color=[0.7,0.7,0.7],linewidth=2)
+    #ax = fig.add_subplot(111)
+    #data = np.concatenate((electrode.x.reshape(-1,1),
+    #                        electrode.y.reshape(-1,1),
+    #                        electrode.z.reshape(-1,1),
+    #                        electrode.LFP[:,tidx]),axis=1)
+
+    x_mesh, z_mesh = np.meshgrid(electrode.x,electrode.z)
+    LFP_mesh = np.zeros((Z[0,0,:].shape[0],x_mesh.shape[0],x_mesh.shape[1]))
+    pdb.set_trace()
+    for k in np.arange(0,Z[0,0,:].shape[0]):
+        for i in np.arange(0,x_mesh.shape[0]):
+            for j in np.arange(0,x_mesh.shape[1]):
+                LFP_mesh[k,i,j] = electrode.LFP[np.nonzero((electrode.x==x_mesh[i,j]) 
+                                                & (electrode.z==z_mesh[i,j]) 
+                                                & (electrode.y==Y[0,0,k]))[0][0],tidx]
+    pdb.set_trace() 
+    for i in np.arange(0,Z[0,0,:].shape[0]):
+        fig = plt.figure(figsize=[15, 15])
+        ax = fig.gca(projection='3d')
+        ax.contourf(x_mesh,z_mesh,LFP_mesh[:,0,:],
+                    offset=Y[0,0,i],
+                    zdir='y',
+                    cmap = cm.coolwarm)
+        #sp[i].set_clim(np.min(LFP_mesh),np.max(LFP_mesh))
+        ax.set_zlim(np.min(Z[0,0,:]),np.max(Z[0,0,:]))
+         
+    #sp = ax.scatter(data[:,0],
+    #                data[:,1],
+    #                data[:,2],
+    #                s=20, c=data[:,3], 
+    #                norm=MidpointNormalize(midpoint=0.),
+    #                cmap='RdBu_r')
+    #plt.colorbar(sp[0])
+    #plt.show()
+    return
+
+def zerosurf(cell,electrode,X,Y,Z,tshow):
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+
+    tidx=cell.tvec==tshow
+    LFP = electrode.LFP[:,tidx]
+
+    # Make 2D array for LFP for plotting surfaces and contours
+    x_mesh, y_mesh = np.meshgrid(electrode.x,electrode.y)
+    LFP_mesh = np.zeros((Z[0,0,:].shape[0],x_mesh.shape[0],x_mesh.shape[1]))
+
+    for k in np.arange(0,Z[0,0,:].shape[0]):
+        for i in np.arange(0,x_mesh.shape[0]):
+            for j in np.arange(0,x_mesh.shape[1]):
+                LFP_mesh[k,i,j] = electrode.LFP[np.nonzero((electrode.x==x_mesh[i,j]) 
+                                                & (electrode.y==y_mesh[i,j]) 
+                                                & (electrode.z==Z[0,0,k]))[0][0],tidx]
+    
+    # Plot zero line
+        pdb.set_trace()
+        ax.contour(x_mesh,y_mesh,LFP_mesh[k,:,:],offset=Z[0,0,k],levels=10,zdir='z')
+    ax.set_zlim(np.min(Z[0,0,:]),np.max(Z[0,0,:]))
+    return
+
+
 
