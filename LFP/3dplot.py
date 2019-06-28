@@ -7,11 +7,12 @@ from numpy import *
 import matplotlib.pyplot as plt
 import pdb
 import neuron
+import pandas as pd
 
 cellParameters = {
     'morphology': 'Henckens_AM-C1A.swc',
-    'templatefile': ['Henckens_AM-C1A_LFPytemplate.hoc'],
-    'templatename': 'Henckens_AMC1A',
+    'templatefile': ['stylized_pyrtypeC_LFPytemplate.hoc'],
+    'templatename': 'stylized_pyrtypeC',
     'passive_parameters':{'g_pas':1./30000,'e_pas':-70.},
     'tstart' : 0,
     'tstop' : 70,
@@ -29,9 +30,9 @@ cellParameters = {
 
 SynapseParameters = {
     'syntype' : 'Exp2Syn',
-    'e' : -75,
+    'e' : -50,
     'tau1' : 0.83,
-    'tau2' : 4.2,
+    'tau2' : 2.2,
     'weight' : 0.009,
     'record_current' : True,
 }
@@ -39,7 +40,7 @@ SynapseParameters = {
 
 # Define electrode parameters
 # Create a grid of measurement locations, in (mum)
-X, Z = np.mgrid[-350:501:100, -350:501:100]
+X, Z = np.mgrid[-350:501:20, -350:601:20]
 Y = np.zeros(X.shape)
 
 electrodeParameters = {
@@ -124,10 +125,63 @@ cell.simulate(electrode=electrode,
               rec_vmem=True,
               rec_current_dipole_moment=True)
 
-from utils import contour3d,plot_elec_grid_stick,zerosurf,plot_ex1
+####################################################################
 
-#plot_elec_grid_stick(cell,electrode)
-plot_ex1(cell,electrode,X,Y,Z,time_show=[50,53,56,59,62],space_lim=[np.min(X[:,0]),np.max(X[:,0]),np.min(Z[0,:]),np.max(Z[0,:])])
-#contour3d(cell,electrode,X,Y,Z,tshow=53)
-#zerosurf(cell,electrode,X,Y,Z,tshow=53)
+
+from matplotlib import cm
+import matplotlib.colors as colors
+
+t_show = [50,53,56,59,62]
+
+fig = plt.figure()
+fig.subplots_adjust(left=0.005,bottom=0.005,right=0.83,top=0.76,wspace=0.1,hspace=0.01)
+ex_ct = []
+inh_ct = []
+rat_ct = []
+for i in np.arange(0,len(t_show)):
+
+    exc = pd.read_csv('./data/stick/excitatory_LFP_at_{}.csv'.format(t_show[i]),header=None)
+    inh = pd.read_csv('./data/stick/inhibitory_LFP_at_{}.csv'.format(t_show[i]),header=None)
+
+    ratio = np.divide(np.abs(exc.values),np.abs(inh.values))
+
+    plt.subplot(3,len(t_show),i+1)
+    A = exc.values.T[::-1]
+    hm1=plt.imshow(np.abs(A),norm=colors.LogNorm(vmin=10e-5,vmax=1),cmap=cm.jet)
+    ex_ct.append(hm1)
+    if i==0:
+        plt.plot([31,36],[44,44],'k-')
+        plt.plot([31,31],[44,39],'k-')
+    plt.axis('off')
+
+    plt.subplot(3,len(t_show),i+len(t_show)+1)
+    B = inh.values.T[::-1]
+    hm2=plt.imshow(np.abs(B),norm=colors.LogNorm(vmin=10e-5,vmax=1),cmap=cm.jet)
+    inh_ct.append(hm2)
+    if i==0:
+        plt.plot([31,36],[44,44],'k-')
+        plt.plot([31,31],[44,39],'k-')
+    plt.axis('off')
+
+    plt.subplot(3,len(t_show),i+2*len(t_show)+1)
+    C = np.divide(np.abs(A),np.abs(B))
+    bounds = np.linspace(0,10,11)
+    hm=plt.imshow(C,cmap=cm.OrRd,norm=colors.BoundaryNorm(boundaries=bounds,ncolors=256))
+    rat_ct.append(hm)
+    if i==0:
+        plt.plot([31,36],[44,44],'k-')
+        plt.plot([31,31],[44,39],'k-')
+    hm.set_clim(0,10)
+    plt.axis('off')
+
+cbaxes1 = fig.add_axes([0.85,0.52,0.03,0.23])
+cbar = plt.colorbar(ex_ct[0],cax=cbaxes1)
+cbaxes2 = fig.add_axes([0.85,0.27,0.03,0.23])
+cbar = plt.colorbar(inh_ct[0],cax=cbaxes2)
+cbaxes3 = fig.add_axes([0.85,0.02,0.03,0.23])
+cbar = plt.colorbar(rat_ct[0],cax=cbaxes3)
+fig.savefig('heatmaps.tiff',bbox_inches='tight',pad_inches=0)
+#from utils import contour3d,plot_elec_grid_stick,zerosurf,plot_ex1
+
+#plot_ex1(cell,electrode,X,Y,Z,time_show=[50,53,56,59,62],space_lim=[np.min(X[:,0]),np.max(X[:,0]),np.min(Z[0,:]),np.max(Z[0,:])])
 plt.show()

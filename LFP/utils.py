@@ -225,6 +225,7 @@ def plot_ex1(cell, electrode, X, Y, Z, time_show, space_lim):
         
         #contour lines
         ct.append(ax1.contourf(X, Z, LFP*1000, n_contours,vmin=-0.00007*1000,vmax=0.00002*1000))
+        #np.savetxt('./data/excitatory_LFP_at_{}.csv'.format(t_show),LFP*1000,delimiter=',')
         ct[i].set_clim((-0.00007*1000, 0.00002*1000))
         ct2 = ax1.contour(X, Z, LFP*1000, n_contours_black, colors='k')
 
