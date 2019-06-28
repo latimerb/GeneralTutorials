@@ -147,7 +147,7 @@ for i in np.arange(0,len(t_show)):
 
     plt.subplot(3,len(t_show),i+1)
     A = exc.values.T[::-1]
-    hm1=plt.imshow(np.abs(A),norm=colors.LogNorm(vmin=10e-5,vmax=1),cmap=cm.jet)
+    hm1=plt.imshow(np.abs(A),norm=colors.LogNorm(vmin=10e-5,vmax=1),cmap=cm.jet,interpolation="none")
     ex_ct.append(hm1)
     if i==0:
         plt.plot([31,36],[44,44],'k-')
@@ -156,7 +156,7 @@ for i in np.arange(0,len(t_show)):
 
     plt.subplot(3,len(t_show),i+len(t_show)+1)
     B = inh.values.T[::-1]
-    hm2=plt.imshow(np.abs(B),norm=colors.LogNorm(vmin=10e-5,vmax=1),cmap=cm.jet)
+    hm2=plt.imshow(np.abs(B),norm=colors.LogNorm(vmin=10e-5,vmax=1),cmap=cm.jet,interpolation="none")
     inh_ct.append(hm2)
     if i==0:
         plt.plot([31,36],[44,44],'k-')
@@ -166,7 +166,7 @@ for i in np.arange(0,len(t_show)):
     plt.subplot(3,len(t_show),i+2*len(t_show)+1)
     C = np.divide(np.abs(A),np.abs(B))
     bounds = np.linspace(0,10,11)
-    hm=plt.imshow(C,cmap=cm.OrRd,norm=colors.BoundaryNorm(boundaries=bounds,ncolors=256))
+    hm=plt.imshow(C,cmap=cm.OrRd,norm=colors.BoundaryNorm(boundaries=bounds,ncolors=256),interpolation="none")
     rat_ct.append(hm)
     if i==0:
         plt.plot([31,36],[44,44],'k-')
